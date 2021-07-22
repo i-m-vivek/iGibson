@@ -193,6 +193,8 @@ class BaseEnv(gym.Env):
             robot = Fetch(self.config)
         elif self.config['robot'] == 'Locobot':
             robot = Locobot(self.config)
+        elif self.config['robot'] == 'Tiago_Single': 
+            robot = Tiago_Single(self.config)
         else:
             raise Exception(
                 'unknown robot type: {}'.format(self.config['robot']))
