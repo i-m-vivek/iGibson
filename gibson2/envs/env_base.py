@@ -7,6 +7,7 @@ from gibson2.robots.jr2_kinova_robot import JR2_Kinova
 from gibson2.robots.freight_robot import Freight
 from gibson2.robots.fetch_robot import Fetch
 from gibson2.robots.locobot_robot import Locobot
+from gibson2.robots.tiago_single_robot import Tiago_Single
 from gibson2.simulator import Simulator
 from gibson2.scenes.empty_scene import EmptyScene
 from gibson2.scenes.stadium_scene import StadiumScene
