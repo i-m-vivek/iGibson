@@ -16,10 +16,8 @@ import gibson2
 import os
 
 
-config = parse_config(os.path.join(gibson2.example_config_path, "turtlebot_demo.yaml"))
-fetch_config = parse_config(
-    os.path.join(gibson2.example_config_path, "fetch_reaching.yaml")
-)
+config = parse_config("tiago_stadium_config.yaml")
+
 settings = MeshRendererSettings(
     enable_shadow=False, msaa=False, enable_pbr=True, texture_scale=1.0
 )
@@ -36,31 +34,14 @@ s = Simulator(
 
 
 scene = StadiumScene()
-# scene = StaticIndoorScene('Rs',
-#   build_graph=True,
-#   pybullet_load_texture=True)
 s.import_scene(scene, load_texture=False)
-# my_robot1 = Freight(config)
-# my_robot2 = Fetch(fetch_config)
-my_robot3 = Tiago_Single(fetch_config)
-# s.import_robot(my_robot1)
-# s.import_robot(my_robot2)
-s.import_robot(my_robot3)
-
-# my_robot1.set_position([1, 0, 2])
-# my_robot2.set_position([0, 0, 0])
-my_robot3.set_position([0, 0, 0])
+my_robot = Tiago_Single(config)
+my_robot.self_collision = True
+s.import_robot(my_robot)
+my_robot.set_position([0, 0, 0])
 
 
-# for _ in range(10):
-#     obj = YCBObject('003_cracker_box')
-#     s.import_object(obj)
-#     obj.set_position_orientation(np.random.uniform(
-#         low=0, high=2, size=3), [0, 0, 0, 1])
-
-print(s.renderer.instances)
-
-print("Action Space: ", my_robot3.action_space)
+print("Action Space: ", my_robot.action_space)
 
 
 action_dim = 14
@@ -82,13 +63,13 @@ all_actions = all_actions.astype(np.float32)
 all_actions = all_actions.tolist()
 
 rgbs = []
-print(my_robot3.parts.keys())
+# print(my_robot.parts.keys())
 # print("Applying some action on the robot :)")
 for i in range(len(all_actions)):
     # my_robot1.apply_action([0.1, 0.01])
     # sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
-    # my_robot3.apply_action(sampl)
-    my_robot3.apply_action(all_actions[i])
+    # my_robot.apply_action(sampl)
+    my_robot.apply_action(all_actions[i])
 
     s.step()
     # with Profiler('Simulator step'):

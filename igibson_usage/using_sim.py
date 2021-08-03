@@ -2,7 +2,7 @@ from gibson2.robots.turtlebot_robot import Turtlebot
 from gibson2.robots.fetch_robot import Fetch
 from gibson2.robots.freight_robot import Freight
 # from gibson2.robots.locobot_robot import locobot_robot
-from gibson2.robots.tiago_single import Tiago_Single
+from gibson2.robots.tiago_single_robot import Tiago_Single
 # from gibson2.robots.tia
 from gibson2.simulator import Simulator
 from gibson2.scenes.stadium_scene import StadiumScene
@@ -17,10 +17,11 @@ import gibson2
 import os
 
 
-config = parse_config(os.path.join(gibson2.example_config_path, "turtlebot_demo.yaml"))
-fetch_config = parse_config(
-    os.path.join(gibson2.example_config_path, "fetch_reaching.yaml")
-)
+# config = parse_config(os.path.join(gibson2.example_config_path, "turtlebot_demo.yaml"))
+# fetch_config = parse_config(
+#     os.path.join(gibson2.example_config_path, "fetch_reaching.yaml")
+# )
+tiago_config = parse_config("tiago_stadium_config.yaml")
 settings = MeshRendererSettings(
     enable_shadow=False, msaa=False, enable_pbr=True, texture_scale=1.0
 )
@@ -42,13 +43,14 @@ scene = StadiumScene()
 #   pybullet_load_texture=True)
 s.import_scene(scene, load_texture=False)
 # my_robot1 = Freight(config)
-my_robot2 = Fetch(fetch_config)
+# my_robot2 = Fetch(fetch_config)
+my_robot2 = Tiago_Single(tiago_config)
 # s.import_robot(my_robot1)
 s.import_robot(my_robot2)
 
 # my_robot1.set_position([1, 0, 2])
 my_robot2.set_position([0, 0, 0])
-
+my_robot2.self_collision = True
 # for _ in range(10):
 #     obj = YCBObject('003_cracker_box')
 #     s.import_object(obj)
