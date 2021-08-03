@@ -2,7 +2,7 @@ from gibson2.robots.turtlebot_robot import Turtlebot
 from gibson2.robots.fetch_robot import Fetch
 from gibson2.robots.freight_robot import Freight
 # from gibson2.robots.locobot_robot import locobot_robot
-from gibson2.robots.tiago_single import Tiago_Single
+from gibson2.robots.tiago_single_robot import Tiago_Single
 # from gibson2.robots.tia
 from gibson2.simulator import Simulator
 from gibson2.scenes.stadium_scene import StadiumScene
