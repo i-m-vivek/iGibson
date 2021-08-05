@@ -23,7 +23,10 @@ class PointNavRandomTask(PointNavFixedTask):
         :param env: environment instance
         :return: initial pose and target position
         """
-        _, initial_pos = env.scene.get_random_point(floor=self.floor_num)
+        if self.config["intial_robot_pos"] is not None: 
+            initial_pos = self.config["intial_robot_pos"]
+        else: 
+            _, initial_pos = env.scene.get_random_point(floor=self.floor_num)
         max_trials = 100
         dist = 0.0
         for _ in range(max_trials):
@@ -34,7 +37,9 @@ class PointNavRandomTask(PointNavFixedTask):
                     initial_pos[:2],
                     target_pos[:2], entire_path=False)
             else:
+                print(initial_pos, target_pos)
                 dist = l2_distance(initial_pos, target_pos)
+                print(dist)
             if self.target_dist_min < dist < self.target_dist_max:
                 break
         if not (self.target_dist_min < dist < self.target_dist_max):

@@ -52,8 +52,9 @@ class ReachingRandomTask(PointNavRandomTask):
         """
         initial_pos, initial_orn, target_pos = \
             super(ReachingRandomTask, self).sample_initial_pose_and_target_pos(env)
-        target_pos += np.random.uniform(self.target_height_range[0],
-                                        self.target_height_range[1])
+        if self.config["scene"] != "empty_table": # in empty table env we don't want to add any more randomness
+            target_pos += np.random.uniform(self.target_height_range[0],
+                                            self.target_height_range[1])
         return initial_pos, initial_orn, target_pos
 
     def get_task_obs(self, env):

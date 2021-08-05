@@ -24,6 +24,8 @@ docs/apidoc
 # vscode
 .vscode/
 
+# random exp 
+igibson_usage/random_exp.py
 # Physics
 physics/*.txt
 physics/*.json
