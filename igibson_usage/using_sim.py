@@ -1,8 +1,10 @@
 from gibson2.robots.turtlebot_robot import Turtlebot
 from gibson2.robots.fetch_robot import Fetch
 from gibson2.robots.freight_robot import Freight
+
 # from gibson2.robots.locobot_robot import locobot_robot
 from gibson2.robots.tiago_single_robot import Tiago_Single
+
 # from gibson2.robots.tia
 from gibson2.simulator import Simulator
 from gibson2.scenes.stadium_scene import StadiumScene
@@ -65,14 +67,14 @@ print("Action Space: ", my_robot2.action_space)
 action_dim = 10
 min_action = -1
 max_action = 1
-division= 25 
+division = 25
 
 all_actions = []
 forward = np.linspace(min_action, max_action, division)
 backward = np.linspace(max_action, min_action, division)
 to_apply = np.concatenate((forward, backward))
 for i in range(action_dim):
-    actions = np.zeros((2*division, action_dim))
+    actions = np.zeros((2 * division, action_dim))
     actions[:, i] = to_apply
     all_actions.append(actions)
 

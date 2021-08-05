@@ -1,5 +1,6 @@
 from gibson2.robots.tiago_single_robot import Tiago_Single
 from gibson2.scenes.stadium_scene import StadiumScene
+from gibson2.scenes.empty_scene import EmptyScene
 from gibson2.render.mesh_renderer.mesh_renderer_settings import MeshRendererSettings
 from gibson2.simulator import Simulator
 import numpy as np
@@ -11,7 +12,9 @@ from gibson2.objects.articulated_object import ArticulatedObject
 
 config = parse_config(
     os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "tiago_stadium_config.yaml"
+        os.path.dirname(os.path.abspath(__file__)),
+        "configs",
+        "tiago_stadium_config.yaml",
     )
 )
 settings = MeshRendererSettings(
@@ -29,11 +32,11 @@ s = Simulator(
 )
 
 
-scene = StadiumScene()
-table_path = "/home/vivek/RESEARCH/TU_Darmstadt/vk_igibson/iGibson/gibson2/data/ig_dataset/objects/table/9ad91992184e2b3e283b00891f680579/9ad91992184e2b3e283b00891f680579.urdf"
-table = ArticulatedObject(table_path, 3)
+scene = EmptyScene()
+table_path = "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/iGibson/gibson2/data/ig_dataset/objects/table/9ad91992184e2b3e283b00891f680579/9ad91992184e2b3e283b00891f680579.urdf"
+table = ArticulatedObject(table_path, 2)
 table.load()
-table.set_position([2, 0, 0])
+table.set_position([2, 0, 0.3])
 myrobot = Tiago_Single(config)
 s.import_scene(scene, load_texture=False)
 s.import_object(table)
