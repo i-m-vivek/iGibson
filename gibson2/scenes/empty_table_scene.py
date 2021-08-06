@@ -16,10 +16,10 @@ class EmptyTableScene(Scene):
     def __init__(
         self,
         table_urdf_path,
-        min_change=2,
-        max_change=2,
-        table_height=0.5,
-        table_scale=2,
+        min_change,
+        max_change,
+        table_height,
+        table_scale,
         table_pos=[2, 0, 0.3],
     ):
         super(EmptyTableScene, self).__init__()
