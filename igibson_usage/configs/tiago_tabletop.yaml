@@ -1,5 +1,5 @@
 # scene
-scene: empty_table
+scene: empty_table # empty, empty_table
 build_graph: false
 load_texture: true
 pybullet_load_texture: true
@@ -16,11 +16,11 @@ object_randomization_freq: null
 # table top task specific parameters 
 min_change: 0.3
 max_change: 0.4
-table_height: 0.6
+table_height: 0.63
 table_scaling: 2 
 intial_robot_pos: [0, 0, 0]
 # robot
-robot: Tiago_Single
+robot: Tiago_Single # Fetch, Tiago_Single
 wheel_velocity: 0.8
 torso_lift_velocity: 0.8
 arm_velocity: 0.8
@@ -42,17 +42,17 @@ collision_reward_weight: -0.01
 discount_factor: 0.99
 
 # termination condition
-dist_tol: 0.1  # body width
+dist_tol: 0.2  # body width
 max_step: 1000
-max_collisions_allowed: 500
+max_collisions_allowed: 1000
 
 # misc config
 initial_pos_z_offset: 0.1
 # collision_ignore_link_a_ids: [0, 1, 2]  # ignore collisions with these robot links
 
 # sensor spec
-# output: [task_obs, rgb, depth, scan]
-output: [task_obs]
+output: [task_obs, rgb, depth, scan]
+# output: [task_obs]
 # image
 # Primesense Carmine 1.09 short-range RGBD sensor
 # http://xtionprolive.com/primesense-carmine-1.09

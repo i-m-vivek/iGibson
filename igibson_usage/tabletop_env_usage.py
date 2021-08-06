@@ -5,7 +5,7 @@ import gibson2
 import os
 from gibson2.render.profiler import Profiler
 import logging
-
+import pickle as pkl
 
 config_filename = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "configs", "tiago_tabletop.yaml"
@@ -28,4 +28,13 @@ for i in range(10000):
         if done:
             logging.info("Episode finished after {} timesteps".format(i + 1))
             break
+data_dict= {
+    "state": state_hist, 
+    "reward": reward_hist, 
+    "done_hist": done_hist,
+    "info_hist": info_hist
+}
+
+with open("pkl_files/tabletop_task.pkl", "wb") as f:
+    pkl.dump(data_dict, f)
 env.close()

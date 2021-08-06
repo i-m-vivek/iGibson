@@ -23,7 +23,10 @@ import os
 # fetch_config = parse_config(
 #     os.path.join(gibson2.example_config_path, "fetch_reaching.yaml")
 # )
-tiago_config = parse_config("tiago_stadium_config.yaml")
+config_filename = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "configs", "tiago_stadium_config.yaml"
+)
+tiago_config = parse_config(config_filename)
 settings = MeshRendererSettings(
     enable_shadow=False, msaa=False, enable_pbr=True, texture_scale=1.0
 )
@@ -64,7 +67,7 @@ print(s.renderer.instances)
 print("Action Space: ", my_robot2.action_space)
 
 
-action_dim = 10
+action_dim = 14
 min_action = -1
 max_action = 1
 division = 25
@@ -85,15 +88,7 @@ all_actions = all_actions.tolist()
 rgbs = []
 print("Applying some action on the robot :)")
 for i in range(len(all_actions)):
-    # my_robot1.apply_action([0.1, 0.01])
-    sampl = np.random.uniform(low=-1, high=1, size=(10,)).tolist()
+    sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
     my_robot2.apply_action(sampl)
-
+    print(my_robot2.get_end_effector_position())
     s.step()
-    # with Profiler('Simulator step'):
-    #     s.step()
-    #     rgb = s.renderer.render_robot_cameras(modes=('rgb'))[0]
-    #     rgbs.append(rgb)
-
-# print(rgbs)
-# print("Type of image", type(rgbs[0]))
