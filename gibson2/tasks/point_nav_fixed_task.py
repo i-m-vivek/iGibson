@@ -68,13 +68,13 @@ class PointNavFixedTask(BaseTask):
                 visual_shape=p.GEOM_SPHERE,
                 rgba_color=[1, 0, 0, 0.3],
                 radius=self.dist_tol,
-                initial_offset=[0, 0, cyl_length / 2.0],
+                initial_offset=[0, 0, 0],
             )
             self.target_pos_vis_obj = VisualMarker(
                 visual_shape=p.GEOM_SPHERE,
                 rgba_color=[0, 0, 1, 0.3],
                 radius=self.dist_tol,
-                initial_offset=[0, 0, cyl_length / 2.0],
+                initial_offset=[0, 0, 0],
             )
 
         else:

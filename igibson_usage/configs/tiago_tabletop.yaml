@@ -14,9 +14,9 @@ texture_randomization_freq: null
 object_randomization_freq: null
 
 # table top task specific parameters 
-min_change: 0.4
-max_change: 0.5
-table_height: 0.3
+min_change: 0.3
+max_change: 0.4
+table_height: 0.6
 table_scaling: 2 
 intial_robot_pos: [0, 0, 0]
 # robot
@@ -36,19 +36,19 @@ task_obs_dim: 4
 reward_type: l2
 success_reward: 10.0
 potential_reward_weight: 1.0
-collision_reward_weight: -0.1
+collision_reward_weight: -0.01
 
 # discount factor
 discount_factor: 0.99
 
 # termination condition
 dist_tol: 0.1  # body width
-max_step: 500
+max_step: 1000
 max_collisions_allowed: 500
 
 # misc config
 initial_pos_z_offset: 0.1
-collision_ignore_link_a_ids: [0, 1, 2]  # ignore collisions with these robot links
+# collision_ignore_link_a_ids: [0, 1, 2]  # ignore collisions with these robot links
 
 # sensor spec
 # output: [task_obs, rgb, depth, scan]
@@ -80,4 +80,4 @@ scan_noise_rate: 0.0
 
 # visual objects
 visual_object_at_initial_target_pos: true
-target_visual_object_visible_to_agent: false
+target_visual_object_visible_to_agent: true

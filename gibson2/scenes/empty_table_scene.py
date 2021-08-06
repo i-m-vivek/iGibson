@@ -59,10 +59,12 @@ class EmptyTableScene(Scene):
         random_pt = np.array(
             [
                 self.table_pos[0]
-                + 0.3+ np.random.uniform(-self.min_change, self.max_change),
+                + 0.3*np.random.choice([1, -1])
+                + np.random.uniform(-self.min_change, self.max_change),
                 self.table_pos[1]
-                + 0.3+ np.random.uniform(-self.min_change, self.max_change),
-                self.table_height
+                + 0.3*np.random.choice([1, -1])
+                + np.random.uniform(-self.min_change, self.max_change),
+                self.table_height,
             ]
         )
         # print(random_pt)

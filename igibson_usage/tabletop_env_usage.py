@@ -16,10 +16,11 @@ reward_hist = []
 done_hist = []
 info_hist = []
 env.reset()
-for i in range(1000):
+for i in range(10000):
     with Profiler("Environment action step"):
         action = env.action_space.sample()
         state, reward, done, info = env.step(action)
+        print(reward)
         state_hist.append(state)
         reward_hist.append(reward)
         done_hist.append(done)
