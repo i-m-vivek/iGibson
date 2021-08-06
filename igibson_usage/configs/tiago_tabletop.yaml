@@ -7,7 +7,8 @@ trav_map_type: no_obj
 trav_map_resolution: 0.1
 trav_map_erosion: 3
 should_open_all_doors: true
-table_urdf_path: /home/vkmittal14/WORKSPACE/TUD/vk_igibson/iGibson/gibson2/data/ig_dataset/objects/table/9ad91992184e2b3e283b00891f680579/9ad91992184e2b3e283b00891f680579.urdf
+# change this path according to the required table 
+table_urdf_path: objects/table/9ad91992184e2b3e283b00891f680579/9ad91992184e2b3e283b00891f680579.urdf
 visual_marker: sphere
 # domain randomization
 texture_randomization_freq: null

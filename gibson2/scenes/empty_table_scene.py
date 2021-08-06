@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from gibson2.utils.utils import l2_distance
 from gibson2.objects.articulated_object import ArticulatedObject
-
+import gibson2
 
 class EmptyTableScene(Scene):
     """
@@ -23,7 +23,7 @@ class EmptyTableScene(Scene):
         table_pos=[2, 0, 0.3],
     ):
         super(EmptyTableScene, self).__init__()
-        self.table_urdf_path = table_urdf_path
+        self.table_urdf_path = os.path.join(gibson2.ig_dataset_path, table_urdf_path)
         self.table_scale = table_scale
         self.table_pos = table_pos
         self.min_change = min_change
