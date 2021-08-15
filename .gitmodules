@@ -9,4 +9,4 @@
 	url = https://github.com/g-truc/glm
 [submodule "HRL4IN"]
 	path = HRL4IN
-	url = git@github.com:i-m-vivek/HRL4IN.git
+	url = ../HRL4IN.git
