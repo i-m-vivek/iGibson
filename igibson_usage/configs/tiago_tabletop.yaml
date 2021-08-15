@@ -31,7 +31,7 @@ task: reaching_random
 target_dist_min: 1.0
 target_dist_max: 100.0
 goal_format: polar
-task_obs_dim: 9
+task_obs_dim: 11
 
 # reward
 reward_type: l2

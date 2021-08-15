@@ -20,6 +20,7 @@ for i in range(10000):
     # with Profiler("Environment action step"):
     action = env.action_space.sample()
     state, reward, done, info = env.step(action)
+    print(state)
     # print(reward)
     state_hist.append(state)
     reward_hist.append(reward)
@@ -28,13 +29,13 @@ for i in range(10000):
     if done:
         logging.info("Episode finished after {} timesteps".format(i + 1))
         break
-data_dict= {
-    "state": state_hist, 
-    "reward": reward_hist, 
-    "done_hist": done_hist,
-    "info_hist": info_hist
-}
-
-with open("pkl_files/tabletop_task.pkl", "wb") as f:
-    pkl.dump(data_dict, f)
+# data_dict= {
+    # "state": state_hist, 
+    # "reward": reward_hist, 
+    # "done_hist": done_hist,
+    # "info_hist": info_hist
+# }
+# 
+# with open("pkl_files/tabletop_task.pkl", "wb") as f:
+    # pkl.dump(data_dict, f)
 env.close()
