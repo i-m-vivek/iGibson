@@ -64,11 +64,12 @@ class ReachingRandomTask(PointNavRandomTask):
         :param env: environment instance
         :return: task-specific observation
         """
-        task_obs = super(ReachingRandomTask, self).get_task_obs(env)
-        goal_z_local = self.global_to_local(env, self.target_pos)[2]
+        task_obs = super(ReachingRandomTask, self).get_task_obs(env) # x, y, vel_x, vel_y, angular_z
+        # print(task_obs.shape, task_obs, "\n") # debug statement
+        goal_z_local = self.global_to_local(env, self.target_pos)[2] # z
         end_effector_pos_local = self.global_to_local(
             env,
-            env.robots[0].get_end_effector_position())
+            env.robots[0].get_end_effector_position()) # end_effector: x, y, z
 
         task_obs = np.append(task_obs, goal_z_local)
         task_obs = np.append(task_obs, end_effector_pos_local)

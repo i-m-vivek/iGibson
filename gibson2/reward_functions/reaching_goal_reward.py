@@ -24,7 +24,7 @@ class ReachingGoalReward(BaseRewardFunction):
         :param env: environment instance
         :return: reward
         """
-        print(env.robots[0].get_end_effector_position(), task.target_pos)
+        # print(env.robots[0].get_end_effector_position(), task.target_pos)
         success = l2_distance(
             env.robots[0].get_end_effector_position(),
             task.target_pos) < self.dist_tol

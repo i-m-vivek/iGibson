@@ -37,9 +37,9 @@ class PointNavRandomTask(PointNavFixedTask):
                     initial_pos[:2],
                     target_pos[:2], entire_path=False)
             else:
-                print(initial_pos, target_pos)
+                # print(initial_pos, target_pos)
                 dist = l2_distance(initial_pos, target_pos)
-                print(dist)
+                # print(dist)
             # TODO: not sure why the loop does not break even if the dist is in the range. 
             if self.target_dist_min < dist < self.target_dist_max:
                 break
