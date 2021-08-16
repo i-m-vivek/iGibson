@@ -31,7 +31,7 @@ task: reaching_random
 target_dist_min: 1.0
 target_dist_max: 100.0
 goal_format: polar
-task_obs_dim: 11
+task_obs_dim: 60
 
 # reward
 reward_type: l2
@@ -81,4 +81,4 @@ scan_noise_rate: 0.0
 
 # visual objects
 visual_object_at_initial_target_pos: true
-target_visual_object_visible_to_agent: false
+target_visual_object_visible_to_agent: true

@@ -207,18 +207,18 @@ class PointNavFixedTask(BaseTask):
         :param env: environment instance
         :return: task-specific observation
         """
-        task_obs = self.global_to_local(env, self.target_pos)[
-            :2
-        ]  # considers on the x and y
-        if self.goal_format == "polar":
-            task_obs = np.array(cartesian_to_polar(task_obs[0], task_obs[1]))
+        # task_obs = self.global_to_local(env, self.target_pos)[
+            # :2
+        # ]  # considers on the x and y
+        # if self.goal_format == "polar":
+            # task_obs = np.array(cartesian_to_polar(task_obs[0], task_obs[1]))
 
         # linear velocity along the x-axis
         linear_velocity = rotate_vector_3d(
             env.robots[0].get_linear_velocity(), *env.robots[0].get_rpy()
         )[:2]  # changed this to include linear velocity in y direction also
         # angular velocity along the z-axis
-        task_obs = np.append(task_obs, [linear_velocity])
+        task_obs = linear_velocity
         angular_velocity = rotate_vector_3d(
             env.robots[0].get_angular_velocity(), *env.robots[0].get_rpy()
         )[2]
