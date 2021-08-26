@@ -17,7 +17,7 @@ import gibson2
 import os
 
 
-config = parse_config("tiago_stadium_config.yaml")
+config = parse_config("configs/tiago_stadium_config.yaml")
 
 settings = MeshRendererSettings(
     enable_shadow=False, msaa=False, enable_pbr=True, texture_scale=1.0
@@ -54,7 +54,7 @@ all_actions = []
 forward = np.linspace(min_action, max_action, division)
 backward = np.linspace(max_action, min_action, division)
 to_apply = np.concatenate((forward, backward))
-for i in range(action_dim):
+for i in range(2):
     actions = np.zeros((2 * division, action_dim))
     actions[:, i] = to_apply
     all_actions.append(actions)

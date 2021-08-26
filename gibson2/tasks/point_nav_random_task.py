@@ -23,7 +23,7 @@ class PointNavRandomTask(PointNavFixedTask):
         :param env: environment instance
         :return: initial pose and target position
         """
-        if self.config["intial_robot_pos"] is not None: 
+        if "intial_robot_pos" in self.config: 
             initial_pos = self.config["intial_robot_pos"]
         else: 
             _, initial_pos = env.scene.get_random_point(floor=self.floor_num)
@@ -91,3 +91,23 @@ class PointNavRandomTask(PointNavFixedTask):
         self.initial_orn = initial_orn
 
         super(PointNavRandomTask, self).reset_agent(env)
+
+    def get_task_obs(self, env):
+        """
+        Get task-specific observation, including goal position, end effector position, etc.
+
+        :param env: environment instance
+        :return: task-specific observation
+        """
+        task_obs = super(PointNavRandomTask, self).get_task_obs(
+            env
+        )  # vel_x, vel_y, angularvel_z
+        
+        robot_pos = env.robots[0].get_position()
+        robot_rpy = env.robots[0].get_rpy()
+
+        proprioceptive_states = np.concatenate([robot_pos, robot_rpy])
+        task_obs = np.append(task_obs, proprioceptive_states)
+        goal_pos = self.target_pos
+        task_obs = np.append(task_obs, goal_pos)
+        return task_obs
