@@ -67,7 +67,7 @@ class ReachingRandomTask(PointNavRandomTask):
         """
         task_obs = super(ReachingRandomTask, self).get_task_obs(
             env
-        )  # vel_x, vel_y, angularvel_z
+        )  # (vel_x, vel_y, angularvel_z), base position, orientation, target pos 
         # print(task_obs.shape, task_obs, "\n") # debug statement
         # goal_z_local = self.global_to_local(env, self.target_pos)[-1] # , z
         # task_obs = np.append(task_obs, goal_z_local)
@@ -76,6 +76,6 @@ class ReachingRandomTask(PointNavRandomTask):
         )  # end_effector: x, y, z
 
         task_obs = np.append(task_obs, end_effector_pos_local)
-        proprioceptive_states = env.robots[0].calc_state()
-        task_obs = np.append(task_obs, proprioceptive_states)
+        # proprioceptive_states = env.robots[0].calc_state()
+        # task_obs = np.append(task_obs, proprioceptive_states)
         return task_obs

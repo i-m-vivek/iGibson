@@ -8,7 +8,7 @@ import pickle
 import numpy as np 
 
 # config_filename = os.path.join(gibson2.example_config_path, 'tiago_point_nav_stadium.yaml')
-config_filename = "igibson_usage/configs/tiago_stadium_point_nav_random.yaml"
+config_filename = "igibson_usage/configs/tiago_stadium_reaching_random.yaml"
 env = iGibsonEnv(config_file=config_filename, mode="gui")
 state_hist = []
 reward_hist = []
@@ -19,12 +19,14 @@ env.reset()
 for i in range(2000):
     with Profiler("Environment action step"):
         action = env.action_space.sample()
-        action = np.array(action)
-        action[2:] = 0
-        action = action.tolist()
+        # action = np.array(action)
+        # action_mask = np.zeros(14)
+        # action_mask[:2] = 1
+        # action = action*action_mask
+        # action = action.tolist()
         state, reward, done, info = env.step(action)
-        print(reward)
-        # print(state)
+        # print(reward)
+        print(state)
         state_hist.append(state)
         reward_hist.append(reward)
         done_hist.append(done)
