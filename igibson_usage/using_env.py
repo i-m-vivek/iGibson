@@ -8,7 +8,7 @@ import pickle
 import numpy as np 
 
 # config_filename = os.path.join(gibson2.example_config_path, 'tiago_point_nav_stadium.yaml')
-config_filename = "igibson_usage/configs/exp_config.yaml"
+config_filename = "igibson_usage/configs/tiago_stadium_point_nav_random.yaml"
 env = iGibsonEnv(config_file=config_filename, mode="gui")
 state_hist = []
 reward_hist = []

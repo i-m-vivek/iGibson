@@ -26,7 +26,7 @@ goal_format: polar
 task_obs_dim: 15 # task obs state feature dim
 intial_robot_pos: [0, 0, 0]
 target_height_range:  [0.2, 0.75]
-additional_states_dim: 6 # 6 for end effector reaching | 3 for base navigation 
+additional_states_dim: 6 
 auxiliary_sensor_dim: 88
 # reward
 reward_type: l2

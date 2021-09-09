@@ -23,8 +23,10 @@ task: point_nav_random
 target_dist_min: 1.0
 target_dist_max: 5.0
 goal_format: polar
-task_obs_dim: 12 # task obs state feature dim
+task_obs_dim: 3 # task obs state feature dim
 intial_robot_pos: [0, 0, 0]
+additional_states_dim: 6 
+auxiliary_sensor_dim: 88
 
 # reward
 reward_type: l2
@@ -36,16 +38,16 @@ collision_reward_weight: 0
 discount_factor: 0.99
 
 # termination condition
-dist_tol: 0.5  # distance tolerance
+dist_tol: 0.2 # distance tolerance
 max_step: 1000
 max_collisions_allowed: 500
 
 # misc config
 initial_pos_z_offset: 0.1
-collision_ignore_link_a_ids: [1, 2, 3, 4]  # ignore collisions with these robot links
+collision_ignore_link_a_ids: []  # ignore collisions with these robot links
 
 # sensor spec
-output: [task_obs]
+output: [task_obs, sensor, auxiliary_sensor, depth]
 # image
 # ASUS Xtion PRO LIVE
 # https://www.asus.com/us/3D-Sensor/Xtion_PRO_LIVE

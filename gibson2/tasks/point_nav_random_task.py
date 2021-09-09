@@ -109,5 +109,5 @@ class PointNavRandomTask(PointNavFixedTask):
         # proprioceptive_states = np.concatenate([robot_pos, robot_rpy])
         # task_obs = np.append(task_obs, proprioceptive_states)
         goal_pos = self.target_pos
-        task_obs = np.append(goal_pos)
-        return task_obs
+        # task_obs = np.array([goal_pos])
+        return goal_pos
