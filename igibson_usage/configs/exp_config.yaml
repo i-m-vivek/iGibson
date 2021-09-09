@@ -20,6 +20,7 @@ velocity: 1.0
 
 # task
 task: reaching_random
+move_arm_only: true
 target_dist_min: 1.0
 target_dist_max: 5.0
 goal_format: polar

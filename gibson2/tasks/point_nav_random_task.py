@@ -13,8 +13,9 @@ class PointNavRandomTask(PointNavFixedTask):
 
     def __init__(self, env):
         super(PointNavRandomTask, self).__init__(env)
-        self.target_dist_min = self.config.get('target_dist_min', 1.0)
-        self.target_dist_max = self.config.get('target_dist_max', 10.0)
+        self.move_arm_only = self.config.get("move_arm_only", False)
+        self.target_dist_min = self.config.get("target_dist_min", 1.0)
+        self.target_dist_max = self.config.get("target_dist_max", 10.0)
 
     def sample_initial_pose_and_target_pos(self, env):
         """
@@ -23,30 +24,44 @@ class PointNavRandomTask(PointNavFixedTask):
         :param env: environment instance
         :return: initial pose and target position
         """
-        if "intial_robot_pos" in self.config: 
+        if "intial_robot_pos" in self.config:
             initial_pos = self.config["intial_robot_pos"]
-        else: 
+        else:
             _, initial_pos = env.scene.get_random_point(floor=self.floor_num)
-        max_trials = 100
-        dist = 0.0
-        for _ in range(max_trials):
-            _, target_pos = env.scene.get_random_point(floor=self.floor_num)
-            if env.scene.build_graph:
-                _, dist = env.scene.get_shortest_path(
-                    self.floor_num,
-                    initial_pos[:2],
-                    target_pos[:2], entire_path=False)
-            else:
-                # print(initial_pos, target_pos)
-                dist = l2_distance(initial_pos, target_pos)
-                # print(dist)
-            # TODO: not sure why the loop does not break even if the dist is in the range. 
-            if self.target_dist_min < dist < self.target_dist_max:
-                break
-        if not (self.target_dist_min < dist < self.target_dist_max):
-            print("WARNING: Failed to sample initial and target positions")
-        initial_orn = np.array([0, 0, np.random.uniform(0, np.pi * 2)])
-        return initial_pos, initial_orn, target_pos
+        if self.move_arm_only:
+            initial_pos = self.config["intial_robot_pos"]
+            initial_orn = [0, 0, 0]
+            target_pos = np.array(
+                [
+                    np.random.uniform(0.25, 0.5),
+                    np.random.choice([np.random.uniform(-0.5, -0.24), np.random.uniform(0.24, 0.5)]),
+                    np.random.uniform(0.3, 1),
+                ]
+            )
+            return initial_pos, initial_orn, target_pos
+        else:
+            max_trials = 100
+            dist = 0.0
+            for _ in range(max_trials):
+                _, target_pos = env.scene.get_random_point(floor=self.floor_num)
+                if env.scene.build_graph:
+                    _, dist = env.scene.get_shortest_path(
+                        self.floor_num,
+                        initial_pos[:2],
+                        target_pos[:2],
+                        entire_path=False,
+                    )
+                else:
+                    # print(initial_pos, target_pos)
+                    dist = l2_distance(initial_pos, target_pos)
+                    # print(dist)
+                # TODO: not sure why the loop does not break even if the dist is in the range.
+                if self.target_dist_min < dist < self.target_dist_max:
+                    break
+            if not (self.target_dist_min < dist < self.target_dist_max):
+                print("WARNING: Failed to sample initial and target positions")
+            initial_orn = np.array([0, 0, np.random.uniform(0, np.pi * 2)])
+            return initial_pos, initial_orn, target_pos
 
     def reset_scene(self, env):
         """
@@ -71,12 +86,14 @@ class PointNavRandomTask(PointNavFixedTask):
         # TODO: p.saveState takes a few seconds, need to speed up
         state_id = p.saveState()
         for i in range(max_trials):
-            initial_pos, initial_orn, target_pos = \
-                self.sample_initial_pose_and_target_pos(env)
+            (
+                initial_pos,
+                initial_orn,
+                target_pos,
+            ) = self.sample_initial_pose_and_target_pos(env)
             reset_success = env.test_valid_position(
-                env.robots[0], initial_pos, initial_orn) and \
-                env.test_valid_position(
-                    env.robots[0], target_pos)
+                env.robots[0], initial_pos, initial_orn
+            ) and env.test_valid_position(env.robots[0], target_pos)
             p.restoreState(state_id)
             if reset_success:
                 break
@@ -102,7 +119,7 @@ class PointNavRandomTask(PointNavFixedTask):
         # task_obs = super(PointNavRandomTask, self).get_task_obs(
         #     env
         # )  # vel_x, vel_y, angularvel_z
-        
+
         # robot_pos = env.robots[0].get_position()
         # robot_rpy = env.robots[0].get_rpy()
 

@@ -50,9 +50,10 @@ class ReachingRandomTask(PointNavRandomTask):
         initial_pos, initial_orn, target_pos = super(
             ReachingRandomTask, self
         ).sample_initial_pose_and_target_pos(env)
-        if (
-            self.config["scene"] != "empty_table"
-        ):  # in empty table env we don't want to add any more randomness
+
+        if self.move_arm_only or self.config["scene"] == "empty_table":
+            return initial_pos, initial_orn, target_pos
+        else:
             target_pos += np.random.uniform(
                 self.target_height_range[0], self.target_height_range[1]
             )
@@ -65,15 +66,13 @@ class ReachingRandomTask(PointNavRandomTask):
         :param env: environment instance
         :return: task-specific observation
         """
-        task_obs = super(ReachingRandomTask, self).get_task_obs(
-            env
-        )  # target pos 
+        task_obs = super(ReachingRandomTask, self).get_task_obs(env)  # target pos
         # only the target pos is required other info are present in the aux information.
         # print(task_obs.shape, task_obs, "\n") # debug statement
         # goal_z_local = self.global_to_local(env, self.target_pos)[-1] # , z
         # task_obs = np.append(task_obs, goal_z_local)
         # end_effector_pos_local = self.global_to_local(
-            # env, env.robots[0].get_end_effector_position()
+        # env, env.robots[0].get_end_effector_position()
         # )  # end_effector: x, y, z
         # task_obs = np.append(task_obs, end_effector_pos_local)
         # proprioceptive_states = env.robots[0].calc_state()
