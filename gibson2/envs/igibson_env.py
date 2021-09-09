@@ -241,16 +241,18 @@ class iGibsonEnv(BaseEnv):
         additional_states = rotate_vector_3d(
             relative_position, *self.robots[0].get_rpy()
         )
-
-        if "reaching" in self.config["task"]:
-            end_effector_pos = (
-                self.robots[0].get_end_effector_position()
-                - self.robots[0].get_position()
-            )
-            end_effector_pos = rotate_vector_3d(
-                end_effector_pos, *self.robots[0].get_rpy()
-            )
-            additional_states = np.concatenate((additional_states, end_effector_pos))
+        # to get the same input state space for base and arm reaching 
+        # we need to give the end-effector position in
+        # both the case, hence commenting the `if` statement
+        # if "reaching" in self.config["task"]:
+        end_effector_pos = (
+            self.robots[0].get_end_effector_position()
+            - self.robots[0].get_position()
+        )
+        end_effector_pos = rotate_vector_3d(
+            end_effector_pos, *self.robots[0].get_rpy()
+        )
+        additional_states = np.concatenate((additional_states, end_effector_pos))
         assert (
             len(additional_states) == self.config["additional_states_dim"]
         ), "additional states dimension mismatch"
@@ -283,7 +285,7 @@ class iGibsonEnv(BaseEnv):
         assert robot_state.shape[0] == 54
         has_collision = 1.0 if len(collision_links) > 0 else -1.0
         robot_state = self.wrap_to_pi(robot_state, np.arange(12, 54, 3))  # wrap wheel and arm joint pos to [-pi, pi]
-
+        # the below step is global_to_local
         end_effector_pos = (
             self.robots[0].get_end_effector_position() - self.robots[0].get_position()
         )
