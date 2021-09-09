@@ -8,7 +8,7 @@ import pickle
 import numpy as np 
 
 # config_filename = os.path.join(gibson2.example_config_path, 'tiago_point_nav_stadium.yaml')
-config_filename = "igibson_usage/configs/tiago_stadium_reaching_random.yaml"
+config_filename = "igibson_usage/configs/exp_config.yaml"
 env = iGibsonEnv(config_file=config_filename, mode="gui")
 state_hist = []
 reward_hist = []
@@ -16,7 +16,7 @@ done_hist = []
 info_hist = []
 env.reset()
 # print("\n\n\n\n\n STARTING THINGS UP \n\n\n\n\n ")
-for i in range(2000):
+for i in range(100):
     with Profiler("Environment action step"):
         action = env.action_space.sample()
         # action = np.array(action)
@@ -36,16 +36,16 @@ for i in range(2000):
             logging.info("Episode finished after {} timesteps".format(i + 1))
             break
 
-# save_dict = {}
-# save_dict["state_hist"] = state_hist
+save_dict = {}
+save_dict["state_hist"] = state_hist
 # save_dict["reward_hist"] = reward_hist
 # save_dict["done_hist"] = done_hist
 # save_dict["info_hist"] = info_hist
 
-# name = "turtlebot"
+name = "sample_states"
 
-# with open(f"{name}.pkl", "wb") as f:
-#     pickle.dump(save_dict, f)
+with open(f"igibson_usage/pkl_files/{name}.pkl", "wb") as f:
+    pickle.dump(save_dict, f)
 # print(type(state))
 # print(state.keys())
 env.close()

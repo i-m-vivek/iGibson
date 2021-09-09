@@ -24,7 +24,7 @@ import os
 #     os.path.join(gibson2.example_config_path, "fetch_reaching.yaml")
 # )
 config_filename = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "configs", "tiago_stadium_config.yaml"
+    os.path.dirname(os.path.abspath(__file__)), "configs", "exp_config.yaml"
 )
 tiago_config = parse_config(config_filename)
 settings = MeshRendererSettings(
@@ -88,7 +88,7 @@ all_actions = all_actions.tolist()
 rgbs = []
 print("Applying some action on the robot :)")
 for i in range(len(all_actions)):
-    sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
-    my_robot2.apply_action(sampl)
+    # sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
+    my_robot2.apply_action(all_actions[i])
     print(my_robot2.get_end_effector_position())
     s.step()

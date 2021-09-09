@@ -11,7 +11,7 @@ from gibson2.sensors.vision_sensor import VisionSensor
 from gibson2.robots.robot_base import BaseRobot
 from gibson2.external.pybullet_tools.utils import stable_z_on_aabb
 from gibson2.sensors.bump_sensor import BumpSensor
-
+from gibson2.utils.utils import rotate_vector_3d
 from transforms3d.euler import euler2quat
 from collections import OrderedDict
 import argparse
@@ -31,7 +31,7 @@ class iGibsonEnv(BaseEnv):
         self,
         config_file,
         scene_id=None,
-        mode='headless',
+        mode="headless",
         action_timestep=1 / 10.0,
         physics_timestep=1 / 240.0,
         device_idx=0,
@@ -48,54 +48,60 @@ class iGibsonEnv(BaseEnv):
         :param render_to_tensor: whether to render directly to pytorch tensors
         :param automatic_reset: whether to automatic reset after an episode finishes
         """
-        super(iGibsonEnv, self).__init__(config_file=config_file,
-                                         scene_id=scene_id,
-                                         mode=mode,
-                                         action_timestep=action_timestep,
-                                         physics_timestep=physics_timestep,
-                                         device_idx=device_idx,
-                                         render_to_tensor=render_to_tensor)
+        super(iGibsonEnv, self).__init__(
+            config_file=config_file,
+            scene_id=scene_id,
+            mode=mode,
+            action_timestep=action_timestep,
+            physics_timestep=physics_timestep,
+            device_idx=device_idx,
+            render_to_tensor=render_to_tensor,
+        )
         self.automatic_reset = automatic_reset
 
     def load_task_setup(self):
         """
         Load task setup
         """
-        self.initial_pos_z_offset = self.config.get(
-            'initial_pos_z_offset', 0.1)
+        self.initial_pos_z_offset = self.config.get("initial_pos_z_offset", 0.1)
         # s = 0.5 * G * (t ** 2)
         drop_distance = 0.5 * 9.8 * (self.action_timestep ** 2)
-        assert drop_distance < self.initial_pos_z_offset, \
-            'initial_pos_z_offset is too small for collision checking'
+        assert (
+            drop_distance < self.initial_pos_z_offset
+        ), "initial_pos_z_offset is too small for collision checking"
 
         # ignore the agent's collision with these body ids
         self.collision_ignore_body_b_ids = set(
-            self.config.get('collision_ignore_body_b_ids', []))
+            self.config.get("collision_ignore_body_b_ids", [])
+        )
         # ignore the agent's collision with these link ids of itself
         self.collision_ignore_link_a_ids = set(
-            self.config.get('collision_ignore_link_a_ids', []))
+            self.config.get("collision_ignore_link_a_ids", [])
+        )
 
         # discount factor
-        self.discount_factor = self.config.get('discount_factor', 0.99)
+        self.discount_factor = self.config.get("discount_factor", 0.99)
 
         # domain randomization frequency
         self.texture_randomization_freq = self.config.get(
-            'texture_randomization_freq', None)
+            "texture_randomization_freq", None
+        )
         self.object_randomization_freq = self.config.get(
-            'object_randomization_freq', None)
+            "object_randomization_freq", None
+        )
 
         # task
-        if self.config['task'] == 'point_nav_fixed':
+        if self.config["task"] == "point_nav_fixed":
             self.task = PointNavFixedTask(self)
-        elif self.config['task'] == 'point_nav_random':
+        elif self.config["task"] == "point_nav_random":
             self.task = PointNavRandomTask(self)
-        elif self.config['task'] == 'interactive_nav_random':
+        elif self.config["task"] == "interactive_nav_random":
             self.task = InteractiveNavRandomTask(self)
-        elif self.config['task'] == 'dynamic_nav_random':
+        elif self.config["task"] == "dynamic_nav_random":
             self.task = DynamicNavRandomTask(self)
-        elif self.config['task'] == 'reaching_random':
+        elif self.config["task"] == "reaching_random":
             self.task = ReachingRandomTask(self)
-        elif self.config['task'] == 'room_rearrangement':
+        elif self.config["task"] == "room_rearrangement":
             self.task = RoomRearrangementTask(self)
         else:
             self.task = None
@@ -104,95 +110,103 @@ class iGibsonEnv(BaseEnv):
         """
         Helper function that builds individual observation spaces
         """
-        return gym.spaces.Box(
-            low=low,
-            high=high,
-            shape=shape,
-            dtype=np.float32)
+        return gym.spaces.Box(low=low, high=high, shape=shape, dtype=np.float32)
 
     def load_observation_space(self):
         """
         Load observation space
         """
-        self.output = self.config['output']
-        self.image_width = self.config.get('image_width', 128)
-        self.image_height = self.config.get('image_height', 128)
+        self.sensor_dim = self.config.get('additional_states_dim', 0)
+        self.auxiliary_sensor_dim = self.config.get("auxiliary_sensor_dim", 0)
+        self.output = self.config["output"]
+        self.image_width = self.config.get("image_width", 128)
+        self.image_height = self.config.get("image_height", 128)
         observation_space = OrderedDict()
         sensors = OrderedDict()
         vision_modalities = []
         scan_modalities = []
 
-        if 'task_obs' in self.output:
-            observation_space['task_obs'] = self.build_obs_space(
-                shape=(self.task.task_obs_dim,), low=-np.inf, high=-np.inf)
-        if 'rgb' in self.output:
-            observation_space['rgb'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 3),
-                low=0.0, high=1.0)
-            vision_modalities.append('rgb')
-        if 'depth' in self.output:
-            observation_space['depth'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 1),
-                low=0.0, high=1.0)
-            vision_modalities.append('depth')
-        if 'pc' in self.output:
-            observation_space['pc'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 3),
-                low=-np.inf, high=np.inf)
-            vision_modalities.append('pc')
-        if 'optical_flow' in self.output:
-            observation_space['optical_flow'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 2),
-                low=-np.inf, high=np.inf)
-            vision_modalities.append('optical_flow')
-        if 'scene_flow' in self.output:
-            observation_space['scene_flow'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 3),
-                low=-np.inf, high=np.inf)
-            vision_modalities.append('scene_flow')
-        if 'normal' in self.output:
-            observation_space['normal'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 3),
-                low=-np.inf, high=np.inf)
-            vision_modalities.append('normal')
-        if 'seg' in self.output:
-            observation_space['seg'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 1),
-                low=0.0, high=1.0)
-            vision_modalities.append('seg')
-        if 'rgb_filled' in self.output:  # use filler
-            observation_space['rgb_filled'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 3),
-                low=0.0, high=1.0)
-            vision_modalities.append('rgb_filled')
-        if 'scan' in self.output:
-            self.n_horizontal_rays = self.config.get('n_horizontal_rays', 128)
-            self.n_vertical_beams = self.config.get('n_vertical_beams', 1)
-            assert self.n_vertical_beams == 1, 'scan can only handle one vertical beam for now'
-            observation_space['scan'] = self.build_obs_space(
+        if "sensor" in self.output:
+            observation_space["sensor"] = self.build_obs_space(
+                shape=(self.sensor_dim,), low=-np.inf, high=np.inf
+            )
+        if "auxiliary_sensor" in self.output:
+            observation_space["auxiliary_sensor"] = self.build_obs_space(
+                shape=(self.auxiliary_sensor_dim,), low=-np.inf, high=np.inf
+            )
+        if "task_obs" in self.output:
+            observation_space["task_obs"] = self.build_obs_space(
+                shape=(self.task.task_obs_dim,), low=-np.inf, high=-np.inf
+            )
+        if "rgb" in self.output:
+            observation_space["rgb"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 3), low=0.0, high=1.0
+            )
+            vision_modalities.append("rgb")
+        if "depth" in self.output:
+            observation_space["depth"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 1), low=0.0, high=1.0
+            )
+            vision_modalities.append("depth")
+        if "pc" in self.output:
+            observation_space["pc"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 3), low=-np.inf, high=np.inf
+            )
+            vision_modalities.append("pc")
+        if "optical_flow" in self.output:
+            observation_space["optical_flow"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 2), low=-np.inf, high=np.inf
+            )
+            vision_modalities.append("optical_flow")
+        if "scene_flow" in self.output:
+            observation_space["scene_flow"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 3), low=-np.inf, high=np.inf
+            )
+            vision_modalities.append("scene_flow")
+        if "normal" in self.output:
+            observation_space["normal"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 3), low=-np.inf, high=np.inf
+            )
+            vision_modalities.append("normal")
+        if "seg" in self.output:
+            observation_space["seg"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 1), low=0.0, high=1.0
+            )
+            vision_modalities.append("seg")
+        if "rgb_filled" in self.output:  # use filler
+            observation_space["rgb_filled"] = self.build_obs_space(
+                shape=(self.image_height, self.image_width, 3), low=0.0, high=1.0
+            )
+            vision_modalities.append("rgb_filled")
+        if "scan" in self.output:
+            self.n_horizontal_rays = self.config.get("n_horizontal_rays", 128)
+            self.n_vertical_beams = self.config.get("n_vertical_beams", 1)
+            assert (
+                self.n_vertical_beams == 1
+            ), "scan can only handle one vertical beam for now"
+            observation_space["scan"] = self.build_obs_space(
                 shape=(self.n_horizontal_rays * self.n_vertical_beams, 1),
-                low=0.0, high=1.0)
-            scan_modalities.append('scan')
-        if 'occupancy_grid' in self.output:
-            self.grid_resolution = self.config.get('grid_resolution', 128)
-            self.occupancy_grid_space = gym.spaces.Box(low=0.0,
-                                                       high=1.0,
-                                                       shape=(self.grid_resolution,
-                                                              self.grid_resolution, 1))
-            observation_space['occupancy_grid'] = self.occupancy_grid_space
-            scan_modalities.append('occupancy_grid')
+                low=0.0,
+                high=1.0,
+            )
+            scan_modalities.append("scan")
+        if "occupancy_grid" in self.output:
+            self.grid_resolution = self.config.get("grid_resolution", 128)
+            self.occupancy_grid_space = gym.spaces.Box(
+                low=0.0, high=1.0, shape=(self.grid_resolution, self.grid_resolution, 1)
+            )
+            observation_space["occupancy_grid"] = self.occupancy_grid_space
+            scan_modalities.append("occupancy_grid")
 
-        if 'bump' in self.output:
-            observation_space['bump'] = gym.spaces.Box(low=0.0,
-                                                       high=1.0,
-                                                       shape=(1,))
-            sensors['bump'] = BumpSensor(self)
+        if "bump" in self.output:
+            observation_space["bump"] = gym.spaces.Box(low=0.0, high=1.0, shape=(1,))
+            sensors["bump"] = BumpSensor(self)
 
         if len(vision_modalities) > 0:
-            sensors['vision'] = VisionSensor(self, vision_modalities)
+            sensors["vision"] = VisionSensor(self, vision_modalities)
 
         if len(scan_modalities) > 0:
-            sensors['scan_occ'] = ScanSensor(self, scan_modalities)
+            sensors["scan_occ"] = ScanSensor(self, scan_modalities)
 
         self.observation_space = gym.spaces.Dict(observation_space)
         self.sensors = sensors
@@ -222,6 +236,81 @@ class iGibsonEnv(BaseEnv):
         self.load_action_space()
         self.load_miscellaneous_variables()
 
+    def get_additional_states(self):
+        relative_position = self.task.target_pos - self.robots[0].get_position()
+        additional_states = rotate_vector_3d(
+            relative_position, *self.robots[0].get_rpy()
+        )
+
+        if "reaching" in self.config["task"]:
+            end_effector_pos = (
+                self.robots[0].get_end_effector_position()
+                - self.robots[0].get_position()
+            )
+            end_effector_pos = rotate_vector_3d(
+                end_effector_pos, *self.robots[0].get_rpy()
+            )
+            additional_states = np.concatenate((additional_states, end_effector_pos))
+        assert (
+            len(additional_states) == self.config["additional_states_dim"]
+        ), "additional states dimension mismatch"
+
+        return additional_states
+
+    def get_auxiliary_states(self, collision_links=[]):
+        """
+        Returns the auxiliary states of the robot.
+
+        Tiago Single has 14 joints:
+            - wheel 1
+            - wheel 2
+            - torso
+            - head joint 1
+            - head joint 2
+            - arm 1
+            - arm 2
+            - arm 3
+            - arm 4
+            - arm 5
+            - arm 6
+            - arm 7
+            - gripper 1
+            - gripper 2
+        """
+        auxiliary_sensor = np.zeros(self.auxiliary_sensor_dim)
+        robot_state = self.robots[0].calc_state()
+        assert self.auxiliary_sensor_dim == 88
+        assert robot_state.shape[0] == 54
+        has_collision = 1.0 if len(collision_links) > 0 else -1.0
+        robot_state = self.wrap_to_pi(robot_state, np.arange(12, 54, 3))  # wrap wheel and arm joint pos to [-pi, pi]
+
+        end_effector_pos = (
+            self.robots[0].get_end_effector_position() - self.robots[0].get_position()
+        )
+        end_effector_pos = rotate_vector_3d(end_effector_pos, *self.robots[0].get_rpy())
+        auxiliary_sensor[:3] = robot_state[:3]  # x, y, z,
+        auxiliary_sensor[3:5] = robot_state[3:5]  # roll, pitch
+        auxiliary_sensor[5:8] = robot_state[6:9]  # vx, vy, vz
+        auxiliary_sensor[8:11] = end_effector_pos  # arm_x, arm_y_ arm_z (local)
+        auxiliary_sensor[11:81:5] = robot_state[12:54:3] # pos wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
+        auxiliary_sensor[12:82:5] = robot_state[13:54:3] # vel wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
+        auxiliary_sensor[13:83:5] = robot_state[14:54:3] # trq wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
+        auxiliary_sensor[14:84:5] = np.cos(robot_state[12:54:3]) # cos(pos) wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
+        auxiliary_sensor[15:85:5] = np.sin(robot_state[12:54:3]) # sin(pos) wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
+        auxiliary_sensor[81:84] = robot_state[9:12] # v_roll, v_pitch, v_yaw
+
+        roll, pitch, yaw = self.robots[0].get_rpy()
+        cos_yaw, sin_yaw = np.cos(yaw), np.sin(yaw)
+        auxiliary_sensor[84:87] = np.array([yaw, cos_yaw, sin_yaw])
+        auxiliary_sensor[87] = has_collision
+        return auxiliary_sensor
+
+    def wrap_to_pi(self, states, indices):
+        states[indices] = states[indices] - 2.0 * np.pi * np.floor(
+            (states[indices] + np.pi) / (np.pi * 2)
+        )
+        return states
+
     def get_state(self, collision_links=[]):
         """
         Get the current observation
@@ -230,18 +319,24 @@ class iGibsonEnv(BaseEnv):
         :return: observation as a dictionary
         """
         state = OrderedDict()
-        if 'task_obs' in self.output:
-            state['task_obs'] = self.task.get_task_obs(self)
-        if 'vision' in self.sensors:
-            vision_obs = self.sensors['vision'].get_obs(self)
+        if "sensor" in self.output:
+            sensor_state = self.get_additional_states()
+            state["sensor"] = sensor_state
+        if "auxiliary_sensor" in self.output:
+            auxiliary_sensor_state = self.get_auxiliary_states(collision_links)
+            state["auxiliary_sensor"] = auxiliary_sensor_state
+        if "task_obs" in self.output:
+            state["task_obs"] = self.task.get_task_obs(self)
+        if "vision" in self.sensors:
+            vision_obs = self.sensors["vision"].get_obs(self)
             for modality in vision_obs:
                 state[modality] = vision_obs[modality]
-        if 'scan_occ' in self.sensors:
-            scan_obs = self.sensors['scan_occ'].get_obs(self)
+        if "scan_occ" in self.sensors:
+            scan_obs = self.sensors["scan_occ"].get_obs(self)
             for modality in scan_obs:
                 state[modality] = scan_obs[modality]
-        if 'bump' in self.sensors:
-            state['bump'] = self.sensors['bump'].get_obs(self)
+        if "bump" in self.sensors:
+            state["bump"] = self.sensors["bump"].get_obs(self)
 
         return state
 
@@ -252,8 +347,7 @@ class iGibsonEnv(BaseEnv):
         :return: collision_links: collisions from last physics timestep
         """
         self.simulator_step()
-        collision_links = list(p.getContactPoints(
-            bodyA=self.robots[0].robot_ids[0]))
+        collision_links = list(p.getContactPoints(bodyA=self.robots[0].robot_ids[0]))
         return self.filter_collision_links(collision_links)
 
     def filter_collision_links(self, collision_links):
@@ -274,7 +368,10 @@ class iGibsonEnv(BaseEnv):
                 continue
 
             # ignore self collision with robot link a (body b is also robot itself)
-            if item[2] == self.robots[0].robot_ids[0] and item[4] in self.collision_ignore_link_a_ids:
+            if (
+                item[2] == self.robots[0].robot_ids[0]
+                and item[4] in self.collision_ignore_link_a_ids
+            ):
                 continue
             new_collision_links.append(item)
         return new_collision_links
@@ -283,8 +380,8 @@ class iGibsonEnv(BaseEnv):
         """
         Populate info dictionary with any useful information
         """
-        info['episode_length'] = self.current_step
-        info['collision_step'] = self.collision_step
+        info["episode_length"] = self.current_step
+        info["collision_step"] = self.collision_step
 
     def step(self, action):
         """
@@ -307,15 +404,13 @@ class iGibsonEnv(BaseEnv):
 
         state = self.get_state(collision_links)
         info = {}
-        reward, info = self.task.get_reward(
-            self, collision_links, action, info)
-        done, info = self.task.get_termination(
-            self, collision_links, action, info)
+        reward, info = self.task.get_reward(self, collision_links, action, info)
+        done, info = self.task.get_termination(self, collision_links, action, info)
         self.task.step(self)
         self.populate_info(info)
 
         if done and self.automatic_reset:
-            info['last_observation'] = state
+            info["last_observation"] = state
             state = self.reset()
 
         return state, reward, done, info
@@ -330,10 +425,15 @@ class iGibsonEnv(BaseEnv):
         self.simulator_step()
         collisions = list(p.getContactPoints(bodyA=body_id))
 
-        if logging.root.level <= logging.DEBUG:  # Only going into this if it is for logging --> efficiency
+        if (
+            logging.root.level <= logging.DEBUG
+        ):  # Only going into this if it is for logging --> efficiency
             for item in collisions:
-                logging.debug('bodyA:{}, bodyB:{}, linkA:{}, linkB:{}'.format(
-                    item[1], item[2], item[3], item[4]))
+                logging.debug(
+                    "bodyA:{}, bodyB:{}, linkA:{}, linkB:{}".format(
+                        item[1], item[2], item[3], item[4]
+                    )
+                )
 
         return len(collisions) == 0
 
@@ -355,7 +455,7 @@ class iGibsonEnv(BaseEnv):
         is_robot = isinstance(obj, BaseRobot)
         body_id = obj.robot_ids[0] if is_robot else obj.body_id
         # first set the correct orientation
-        obj.set_position_orientation(pos, quatToXYZW(euler2quat(*orn), 'wxyz'))
+        obj.set_position_orientation(pos, quatToXYZW(euler2quat(*orn), "wxyz"))
         # compute stable z based on this orientation
         stable_z = stable_z_on_aabb(body_id, [pos, pos])
         # change the z-value of position with stable_z + additional offset
@@ -455,35 +555,43 @@ class iGibsonEnv(BaseEnv):
         return state
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--config',
-        '-c',
-        help='which config file to use [default: use yaml files in examples/configs]')
-    parser.add_argument('--mode',
-                        '-m',
-                        choices=['headless', 'gui', 'iggui'],
-                        default='headless',
-                        help='which mode for simulation (default: headless)')
+        "--config",
+        "-c",
+        help="which config file to use [default: use yaml files in examples/configs]",
+    )
+    parser.add_argument(
+        "--mode",
+        "-m",
+        choices=["headless", "gui", "iggui"],
+        default="headless",
+        help="which mode for simulation (default: headless)",
+    )
     args = parser.parse_args()
 
-    env = iGibsonEnv(config_file=args.config,
-                     mode=args.mode,
-                     action_timestep=1.0 / 10.0,
-                     physics_timestep=1.0 / 40.0)
+    env = iGibsonEnv(
+        config_file=args.config,
+        mode=args.mode,
+        action_timestep=1.0 / 10.0,
+        physics_timestep=1.0 / 40.0,
+    )
 
     step_time_list = []
     for episode in range(100):
-        print('Episode: {}'.format(episode))
+        print("Episode: {}".format(episode))
         start = time.time()
         env.reset()
         for _ in range(100):  # 10 seconds
             action = env.action_space.sample()
             state, reward, done, _ = env.step(action)
-            print('reward', reward)
+            print("reward", reward)
             if done:
                 break
-        print('Episode finished after {} timesteps, took {} seconds.'.format(
-            env.current_step, time.time() - start))
+        print(
+            "Episode finished after {} timesteps, took {} seconds.".format(
+                env.current_step, time.time() - start
+            )
+        )
     env.close()
