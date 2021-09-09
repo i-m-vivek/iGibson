@@ -99,15 +99,15 @@ class PointNavRandomTask(PointNavFixedTask):
         :param env: environment instance
         :return: task-specific observation
         """
-        task_obs = super(PointNavRandomTask, self).get_task_obs(
-            env
-        )  # vel_x, vel_y, angularvel_z
+        # task_obs = super(PointNavRandomTask, self).get_task_obs(
+        #     env
+        # )  # vel_x, vel_y, angularvel_z
         
-        robot_pos = env.robots[0].get_position()
-        robot_rpy = env.robots[0].get_rpy()
+        # robot_pos = env.robots[0].get_position()
+        # robot_rpy = env.robots[0].get_rpy()
 
-        proprioceptive_states = np.concatenate([robot_pos, robot_rpy])
-        task_obs = np.append(task_obs, proprioceptive_states)
+        # proprioceptive_states = np.concatenate([robot_pos, robot_rpy])
+        # task_obs = np.append(task_obs, proprioceptive_states)
         goal_pos = self.target_pos
-        task_obs = np.append(task_obs, goal_pos)
+        task_obs = np.append(goal_pos)
         return task_obs

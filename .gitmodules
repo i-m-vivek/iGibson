@@ -1,6 +1,7 @@
 [submodule "gibson2/render/pybind11"]
 	path = gibson2/render/pybind11
 	url = https://github.com/pybind/pybind11.git
+	ignore = dirty
 [submodule "gibson2/render/glfw"]
 	path = gibson2/render/glfw
 	url = https://github.com/glfw/glfw
