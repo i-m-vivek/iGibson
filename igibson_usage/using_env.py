@@ -30,7 +30,7 @@ for i in range(1000):
         # print(p.getContactPoints(env.scene.table, env.robots[0].robot_ids[0]))
         # print(reward)
         # print(state["task_obs"])
-        # state_hist.append(state)
+        state_hist.append(state)
         # reward_hist.append(reward)
         # done_hist.append(done)
         # info_hist.append(info)
@@ -47,8 +47,8 @@ save_dict["state_hist"] = state_hist
 
 name = "sample_states"
 
-# with open(f"igibson_usage/pkl_files/{name}.pkl", "wb") as f:
-#     pickle.dump(save_dict, f)
+with open(f"igibson_usage/pkl_files/{name}.pkl", "wb") as f:
+    pickle.dump(save_dict, f)
 # print(type(state))
 # print(state.keys())
 env.close()
