@@ -4,7 +4,7 @@ from gibson2.termination_conditions.reaching_goal import ReachingGoal
 from gibson2.reward_functions.point_goal_reward import PointGoalReward
 from gibson2.reward_functions.reaching_goal_reward import ReachingGoalReward
 from gibson2.utils.utils import l2_distance
-
+from gibson2.reward_functions.collision_reward import TableCollisionReward
 import numpy as np
 
 
@@ -21,6 +21,8 @@ class ReachingRandomTask(PointNavRandomTask):
         self.termination_conditions[-1] = ReachingGoal(self.config)
         assert isinstance(self.reward_functions[-1], PointGoalReward)
         self.reward_functions[-1] = ReachingGoalReward(self.config)
+        if self.config["scene"] == "empty_table":
+            self.reward_functions.append(TableCollisionReward(self.config))
 
     def get_l2_potential(self, env):
         """

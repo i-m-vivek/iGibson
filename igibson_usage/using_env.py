@@ -6,9 +6,9 @@ from gibson2.render.profiler import Profiler
 import logging
 import pickle
 import numpy as np 
-
+import pybullet as p
 # config_filename = os.path.join(gibson2.example_config_path, 'tiago_point_nav_stadium.yaml')
-config_filename = "igibson_usage/configs/exp_config.yaml"
+config_filename = "igibson_usage/configs/tiago_tabletop.yaml"
 env = iGibsonEnv(config_file=config_filename, mode="gui")
 state_hist = []
 reward_hist = []
@@ -19,14 +19,17 @@ env.reset()
 for i in range(1000):
     with Profiler("Environment action step"):
         action = env.action_space.sample()
-        action = np.array(action)
-        action_mask = np.zeros(14)
-        action_mask[2:] = 1
-        action = action*action_mask
-        action = action.tolist()
+        # action = np.array(action)
+        # action_mask = np.zeros(14)
+        # action_mask[2:] = 1
+        # action = action*action_mask
+        # action = action.tolist()
+        # print(env.scene.table)
+        # env.check_collision(env.scene.table)
         state, reward, done, info = env.step(action)
+        # print(p.getContactPoints(env.scene.table, env.robots[0].robot_ids[0]))
         # print(reward)
-        print(state["task_obs"])
+        # print(state["task_obs"])
         # state_hist.append(state)
         # reward_hist.append(reward)
         # done_hist.append(done)

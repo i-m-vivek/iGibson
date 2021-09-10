@@ -1,5 +1,5 @@
 from gibson2.reward_functions.reward_function_base import BaseRewardFunction
-
+import pybullet as p
 
 class CollisionReward(BaseRewardFunction):
     """
@@ -24,3 +24,29 @@ class CollisionReward(BaseRewardFunction):
         """
         has_collision = float(len(env.collision_links) > 0)
         return has_collision * self.collision_reward_weight
+
+class TableCollisionReward(BaseRewardFunction):
+    """
+    Collision reward
+    Penalize robot collision with Table in TabletopReaching Scene. 
+    Typically collision_reward_weight is negative.
+    """
+
+    def __init__(self, config):
+        super(TableCollisionReward, self).__init__(config)
+        self.table_collision_reward_weight = self.config.get(
+            'table_collision_reward_weight', -0.1
+        )
+
+    def get_reward(self, task, env):
+        """
+        Reward is self.collision_reward_weight if there is collision
+        in the last timestep
+
+        :param task: task instance
+        :param env: environment instance
+        :return: reward
+        """
+        collision_links = p.getContactPoints(env.scene.table, env.robots[0].robot_ids[0])
+        has_collision = float(len(collision_links) > 0)
+        return has_collision * self.table_collision_reward_weight

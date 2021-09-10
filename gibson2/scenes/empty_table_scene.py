@@ -8,6 +8,7 @@ from gibson2.utils.utils import l2_distance
 from gibson2.objects.articulated_object import ArticulatedObject
 import gibson2
 
+
 class EmptyTableScene(Scene):
     """
     A empty scene for debugging
@@ -59,11 +60,13 @@ class EmptyTableScene(Scene):
         random_pt = np.array(
             [
                 self.table_pos[0]
-                + 0.3*np.random.choice([1, -1])
-                + np.random.uniform(-self.min_change, self.max_change),
+                + np.random.choice(
+                    [np.random.uniform(-0.35, -0.5), np.random.uniform(0.35, 0.5)]
+                ),
                 self.table_pos[1]
-                + 0.3*np.random.choice([1, -1])
-                + np.random.uniform(-self.min_change, self.max_change),
+                + np.random.choice(
+                    [np.random.uniform(-0.35, -0.5), np.random.uniform(0.35, 0.5)]
+                ),
                 self.table_height,
             ]
         )
