@@ -245,14 +245,18 @@ class iGibsonEnv(BaseEnv):
         # we need to give the end-effector position in
         # both the case, hence commenting the `if` statement
         # if "reaching" in self.config["task"]:
-        end_effector_pos = (
-            self.robots[0].get_end_effector_position()
-            - self.robots[0].get_position()
-        )
-        end_effector_pos = rotate_vector_3d(
-            end_effector_pos, *self.robots[0].get_rpy()
-        )
-        additional_states = np.concatenate((additional_states, end_effector_pos))
+
+        # >>>>>>>>>>>>>>> Temp Comment >>>>>>>>>>>>>>>
+        # end_effector_pos = (
+        #     self.robots[0].get_end_effector_position()
+        #     - self.robots[0].get_position()
+        # )
+        # end_effector_pos = rotate_vector_3d(
+        #     end_effector_pos, *self.robots[0].get_rpy()
+        # )
+        # additional_states = np.concatenate((additional_states, end_effector_pos))
+        # <<<<<<<<<<<<<<< Temp Comment <<<<<<<<<<<<<<<
+        
         assert (
             len(additional_states) == self.config["additional_states_dim"]
         ), "additional states dimension mismatch"
