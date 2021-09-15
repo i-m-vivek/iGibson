@@ -7,8 +7,9 @@ import logging
 import pickle
 import numpy as np 
 import pybullet as p
+# gibson2/examples/configs/turtlebot_interactive_nav.yaml
 # config_filename = os.path.join(gibson2.example_config_path, 'tiago_point_nav_stadium.yaml')
-config_filename = "igibson_usage/configs/tiago_tabletop.yaml"
+config_filename = "gibson2/examples/configs/turtlebot_interactive_nav.yaml"
 env = iGibsonEnv(config_file=config_filename, mode="gui")
 state_hist = []
 reward_hist = []
