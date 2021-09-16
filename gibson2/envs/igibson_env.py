@@ -247,14 +247,14 @@ class iGibsonEnv(BaseEnv):
         # if "reaching" in self.config["task"]:
 
         # >>>>>>>>>>>>>>> Temp Comment >>>>>>>>>>>>>>>
-        # end_effector_pos = (
-        #     self.robots[0].get_end_effector_position()
-        #     - self.robots[0].get_position()
-        # )
-        # end_effector_pos = rotate_vector_3d(
-        #     end_effector_pos, *self.robots[0].get_rpy()
-        # )
-        # additional_states = np.concatenate((additional_states, end_effector_pos))
+        end_effector_pos = (
+            self.robots[0].get_end_effector_position()
+            - self.robots[0].get_position()
+        )
+        end_effector_pos = rotate_vector_3d(
+            end_effector_pos, *self.robots[0].get_rpy()
+        )
+        additional_states = np.concatenate((additional_states, end_effector_pos))
         # <<<<<<<<<<<<<<< Temp Comment <<<<<<<<<<<<<<<
         
         assert (
