@@ -20,9 +20,9 @@ import os
 
 
 # config = parse_config(os.path.join(gibson2.example_config_path, "turtlebot_demo.yaml"))
-# fetch_config = parse_config(
-#     os.path.join(gibson2.example_config_path, "fetch_reaching.yaml")
-# )
+fetch_config = parse_config(
+    os.path.join(gibson2.example_config_path, "fetch_reaching.yaml")
+)
 config_filename = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "configs", "exp_config.yaml"
 )
@@ -55,7 +55,7 @@ s.import_robot(my_robot2)
 
 # my_robot1.set_position([1, 0, 2])
 my_robot2.set_position([0, 0, 0])
-my_robot2.self_collision = True
+my_robot2.self_collision = False
 # for _ in range(10):
 #     obj = YCBObject('003_cracker_box')
 #     s.import_object(obj)
@@ -67,9 +67,9 @@ print(s.renderer.instances)
 print("Action Space: ", my_robot2.action_space)
 
 
-action_dim = 14
-min_action = -1
-max_action = 1
+action_dim = my_robot2.action_space.shape[0]
+min_action = -10
+max_action = 10
 division = 25
 
 all_actions = []

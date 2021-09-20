@@ -88,7 +88,7 @@ def main():
         max_grad_norm=args.max_grad_norm,
         use_clipped_value_loss=True,
     )
-    ckpt_path = "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/trained_model_wts/tiago_stadium_point_nav_random_hrl4in_ss/ckpt.5570.pth"
+    ckpt_path = "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/trained_model_wts/tiago_stadium_arm_reaching_hrl4in_ss/ckpt.4870.pth"
     if ckpt_path is not None:
         ckpt = torch.load(ckpt_path, map_location=device)
         agent.load_state_dict(ckpt["state_dict"])
@@ -111,6 +111,7 @@ def main():
             )
         actions_np = actions.cpu().numpy()
         actions_np = actions_np*action_mask
+        print(actions_np)
         outputs = eval_envs.step(actions_np)
 
         observations, rewards, dones, infos = [list(x) for x in zip(*outputs)]
