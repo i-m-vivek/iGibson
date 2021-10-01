@@ -55,7 +55,7 @@ s.import_robot(my_robot2)
 
 # my_robot1.set_position([1, 0, 2])
 my_robot2.set_position([0, 0, 0])
-my_robot2.self_collision = False
+my_robot2.self_collision = True
 # for _ in range(10):
 #     obj = YCBObject('003_cracker_box')
 #     s.import_object(obj)
@@ -68,14 +68,16 @@ print("Action Space: ", my_robot2.action_space)
 
 
 action_dim = my_robot2.action_space.shape[0]
-min_action = -10
-max_action = 10
-division = 25
+min_action = -0.8
+max_action = 0.8
+division = 50
 
 all_actions = []
 forward = np.linspace(min_action, max_action, division)
 backward = np.linspace(max_action, min_action, division)
 to_apply = np.concatenate((forward, backward))
+
+# myaction = np.array([0,0,0,1.2, 1.2, 0.8, 1.33, 0.5, 1.33, 0.5])
 for i in range(action_dim):
     actions = np.zeros((2 * division, action_dim))
     actions[:, i] = to_apply
@@ -87,8 +89,9 @@ all_actions = all_actions.tolist()
 
 rgbs = []
 print("Applying some action on the robot :)")
+# print(my_robot2.parts.keys())
 for i in range(len(all_actions)):
     # sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
     my_robot2.apply_action(all_actions[i])
-    print(my_robot2.get_end_effector_position())
+    # print(my_robot2.get_end_effector_position())
     s.step()

@@ -60,6 +60,7 @@ class BaseEnv(gym.Env):
         )
         self.object_randomization_idx = 0
         self.num_object_randomization_idx = 10
+        self.electricity_reward_weight = self.config.get("electricity_reward_weight", 0.0)
 
         enable_shadow = self.config.get("enable_shadow", False)
         enable_pbr = self.config.get("enable_pbr", True)

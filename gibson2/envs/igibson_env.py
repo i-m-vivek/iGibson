@@ -411,6 +411,14 @@ class iGibsonEnv(BaseEnv):
         state = self.get_state(collision_links)
         info = {}
         reward, info = self.task.get_reward(self, collision_links, action, info)
+        
+        # -ve electricity reward, independent on the task
+        base_moving = np.any(np.abs(action[:2]) >= 0.01)
+        arm_moving = np.any(np.abs(action[2:]) >= 0.01)
+        electricity_reward = float(base_moving) + float(arm_moving)
+        self.energy_cost += electricity_reward
+        reward += electricity_reward * self.electricity_reward_weight
+
         done, info = self.task.get_termination(self, collision_links, action, info)
         self.task.step(self)
         self.populate_info(info)
