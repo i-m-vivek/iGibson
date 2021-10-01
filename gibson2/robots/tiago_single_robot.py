@@ -54,7 +54,7 @@ class Tiago_Single(LocomotorRobot):
         )
         LocomotorRobot.__init__(
             self,
-            "tiago/tiago.urdf",
+            "tiago/tiago_single.urdf",
             action_dim=action_dim,
             scale=config.get("robot_scale", 1.0),
             is_discrete=config.get("is_discrete", False),
