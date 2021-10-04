@@ -438,7 +438,14 @@ class iGibsonEnv(BaseEnv):
         """
         self.simulator_step()
         collisions = list(p.getContactPoints(bodyA=body_id))
-
+        # print(len(collisions))
+        # print(collisions)
+        # In tiago there are some collisions when it is initialized, but we those collisions does not affect much. Hence, we filter out those collisions.
+        flag = True
+        for item in collisions:
+            if item[1] != item[2]:
+                flag = False
+                break
         if (
             logging.root.level <= logging.DEBUG
         ):  # Only going into this if it is for logging --> efficiency
@@ -449,7 +456,8 @@ class iGibsonEnv(BaseEnv):
                     )
                 )
 
-        return len(collisions) == 0
+        # return len(collisions) == 0
+        return flag
 
     def set_pos_orn_with_z_offset(self, obj, pos, orn=None, offset=None):
         """

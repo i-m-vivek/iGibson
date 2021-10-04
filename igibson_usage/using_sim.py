@@ -68,9 +68,9 @@ print("Action Space: ", my_robot2.action_space)
 
 
 action_dim = my_robot2.action_space.shape[0]
-min_action = -0.8
-max_action = 0.8
-division = 50
+min_action = -0.9
+max_action = 0.9
+division = 75
 
 all_actions = []
 forward = np.linspace(min_action, max_action, division)
