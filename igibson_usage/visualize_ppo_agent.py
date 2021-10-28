@@ -88,7 +88,7 @@ def main():
         max_grad_norm=args.max_grad_norm,
         use_clipped_value_loss=True,
     )
-    ckpt_path = "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/trained_model_wts/tiago_stadium_arm_reaching_hrl4in_ss/ckpt.4870.pth"
+    ckpt_path = "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/trained_model_wts/ckpt.19110.pth"
     if ckpt_path is not None:
         ckpt = torch.load(ckpt_path, map_location=device)
         agent.load_state_dict(ckpt["state_dict"])

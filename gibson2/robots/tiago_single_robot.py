@@ -152,11 +152,11 @@ class Tiago_Single(LocomotorRobot):
             ["torso_lift_link", "arm_3_link"],
             ["torso_fixed_column_link", "arm_3_link"],
 
-            # # ["torso_fixed_link", "arm_4_link"], # also causes some weird behaviour but the robot remains stable after loading
+            # ["torso_fixed_link", "arm_4_link"], # also causes some weird behaviour but the robot remains stable after loading
             ["torso_lift_link", "arm_4_link"],
             ["torso_fixed_column_link", "arm_4_link"],
 
-            # ["torso_fixed_link", "arm_5_link"], # also causes some weird behaviour but the robot remains stable after loading
+            ["torso_fixed_link", "arm_5_link"], # also causes some weird behaviour but the robot remains stable after loading
             ["torso_lift_link", "arm_5_link"],
             ["torso_fixed_column_link", "arm_5_link"],
             

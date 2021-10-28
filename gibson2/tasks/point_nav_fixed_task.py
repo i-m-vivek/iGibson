@@ -63,7 +63,8 @@ class PointNavFixedTask(BaseTask):
             return
 
         cyl_length = 0.2
-        if self.config["visual_marker"] == "sphere":
+        visual_marker = self.config.get("visual_marker", None)
+        if visual_marker == "sphere":
             self.initial_pos_vis_obj = VisualMarker(
                 visual_shape=p.GEOM_SPHERE,
                 rgba_color=[1, 0, 0, 0.3],
@@ -208,15 +209,17 @@ class PointNavFixedTask(BaseTask):
         :return: task-specific observation
         """
         # task_obs = self.global_to_local(env, self.target_pos)[
-            # :2
+        # :2
         # ]  # considers on the x and y
         # if self.goal_format == "polar":
-            # task_obs = np.array(cartesian_to_polar(task_obs[0], task_obs[1]))
+        # task_obs = np.array(cartesian_to_polar(task_obs[0], task_obs[1]))
 
         # linear velocity along the x-axis
         linear_velocity = rotate_vector_3d(
             env.robots[0].get_linear_velocity(), *env.robots[0].get_rpy()
-        )[:2]  # changed this to include linear velocity in y direction also
+        )[
+            :2
+        ]  # changed this to include linear velocity in y direction also
         # angular velocity along the z-axis
         task_obs = linear_velocity
         angular_velocity = rotate_vector_3d(

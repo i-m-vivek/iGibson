@@ -68,8 +68,8 @@ print("Action Space: ", my_robot2.action_space)
 
 
 action_dim = my_robot2.action_space.shape[0]
-min_action = -0.9
-max_action = 0.9
+min_action = -1
+max_action = 1
 division = 75
 
 all_actions = []
@@ -78,7 +78,7 @@ backward = np.linspace(max_action, min_action, division)
 to_apply = np.concatenate((forward, backward))
 
 # myaction = np.array([0,0,0,1.2, 1.2, 0.8, 1.33, 0.5, 1.33, 0.5])
-for i in range(action_dim):
+for i in range(5,action_dim):
     actions = np.zeros((2 * division, action_dim))
     actions[:, i] = to_apply
     all_actions.append(actions)
@@ -90,8 +90,17 @@ all_actions = all_actions.tolist()
 rgbs = []
 print("Applying some action on the robot :)")
 # print(my_robot2.parts.keys())
-for i in range(len(all_actions)):
-    # sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
-    my_robot2.apply_action(all_actions[i])
-    # print(my_robot2.get_end_effector_position())
+# for i in range(len(all_actions)):
+#     # sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
+#     my_robot2.apply_action(all_actions[i])
+#     # print(my_robot2.get_end_effector_position())
+#     s.step()
+
+for i in range(10000):
+    sampl = np.random.uniform(low=-1, high=1, size=(14,)).tolist()
+    # sampl[2] = 1
+    # sampl[-1] = -1
+    # sampl[-2] = -1
+
+    my_robot2.apply_action(sampl)
     s.step()

@@ -30,6 +30,5 @@ python -u visualize_ppo_agent.py \
    --experiment-folder "ckpt/ppo_tiago_tabletop_hrl4in_ss" \
    --checkpoint-interval 10 \
    --checkpoint-index -1 \
-   --config-file "tiago_stadium_arm_reaching.yaml" \
+   --config-file "tiago_tabletop.yaml" \
    --num-eval-episodes 1 \
-   --use_arm_only
