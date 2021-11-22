@@ -25,19 +25,25 @@ class PointNavRandomTask(PointNavFixedTask):
         :return: initial pose and target position
         """
         if "intial_robot_pos" in self.config:
-            initial_pos = self.config["intial_robot_pos"]
+            initial_pos = np.array(self.config["intial_robot_pos"])
         else:
             _, initial_pos = env.scene.get_random_point(floor=self.floor_num)
         if self.move_arm_only:
-            initial_pos = self.config["intial_robot_pos"]
-            initial_orn = [0, 0, 0]
+            yaw = np.random.uniform(0, 2*np.pi)
+            angle_offset = np.random.uniform(-np.pi/7, -np.pi/7)
+            dist_offset = np.random.uniform(0.3, 0.75)
+            x_offset = dist_offset*np.cos(yaw + angle_offset)
+            y_offset = dist_offset*np.sin(yaw + angle_offset)
+
+            initial_orn = [0, 0, yaw]
             target_pos = np.array(
                 [
-                    np.random.uniform(0.25, 0.5),
-                    np.random.choice([np.random.uniform(-0.5, -0.24), np.random.uniform(0.24, 0.5)]),
-                    np.random.uniform(0.3, 1),
+                    x_offset,
+                    y_offset,
+                    np.random.uniform(0.3, 0.9),
                 ]
             )
+            target_pos = initial_pos + target_pos
             return initial_pos, initial_orn, target_pos
         else:
             max_trials = 100

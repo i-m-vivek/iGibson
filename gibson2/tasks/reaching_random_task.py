@@ -21,7 +21,10 @@ class ReachingRandomTask(PointNavRandomTask):
         self.termination_conditions[-1] = ReachingGoal(self.config)
         assert isinstance(self.reward_functions[-1], PointGoalReward)
         self.reward_functions[-1] = ReachingGoalReward(self.config)
-        if self.config["scene"] == "empty_table":
+        if (
+            self.config["scene"] == "empty_table"
+            or self.config["scene"] == "tabletop_planning"
+        ):
             self.reward_functions.append(TableCollisionReward(self.config))
 
     def get_l2_potential(self, env):
@@ -53,7 +56,11 @@ class ReachingRandomTask(PointNavRandomTask):
             ReachingRandomTask, self
         ).sample_initial_pose_and_target_pos(env)
 
-        if self.move_arm_only or self.config["scene"] == "empty_table":
+        if (
+            self.move_arm_only
+            or self.config["scene"] == "empty_table"
+            or self.config["scene"] == "tabletop_planning"
+        ):
             return initial_pos, initial_orn, target_pos
         else:
             target_pos += np.random.uniform(

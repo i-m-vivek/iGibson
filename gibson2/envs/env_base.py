@@ -11,6 +11,7 @@ from gibson2.robots.tiago_single_robot import Tiago_Single
 from gibson2.simulator import Simulator
 from gibson2.scenes.empty_scene import EmptyScene
 from gibson2.scenes.stadium_scene import StadiumScene
+from gibson2.scenes.gibson_table_scene import StaticTableTopScene
 from gibson2.scenes.gibson_indoor_scene import StaticIndoorScene
 from gibson2.scenes.igibson_indoor_scene import InteractiveIndoorScene
 from gibson2.scenes.empty_table_scene import EmptyTableScene
@@ -60,7 +61,9 @@ class BaseEnv(gym.Env):
         )
         self.object_randomization_idx = 0
         self.num_object_randomization_idx = 10
-        self.electricity_reward_weight = self.config.get("electricity_reward_weight", 0.0)
+        self.electricity_reward_weight = self.config.get(
+            "electricity_reward_weight", 0.0
+        )
 
         enable_shadow = self.config.get("enable_shadow", False)
         enable_pbr = self.config.get("enable_pbr", True)
@@ -144,6 +147,23 @@ class BaseEnv(gym.Env):
                 max_change=self.config.get("max_change", 0.5),
                 table_height=self.config.get("table_height", 0.5),
                 table_scale=self.config.get("table_scaling", 2),
+            )
+            self.simulator.import_scene(
+                scene, load_texture=self.config.get("load_texture", True)
+            )
+        elif self.config["scene"] == "tabletop_planning":
+            scene = StaticTableTopScene(
+                scene_id="TableTop",
+                min_change=self.config.get("min_change", 0.3),
+                max_change=self.config.get("max_change", 0.5),
+                table_height=self.config.get("table_height", 0.5),
+                table_scale=self.config.get("table_scaling", 2),
+                waypoint_resolution=self.config.get("waypoint_resolution", 0.2),
+                num_waypoints=self.config.get("num_waypoints", 10),
+                build_graph=self.config.get("build_graph", False),
+                trav_map_resolution=self.config.get("trav_map_resolution", 0.1),
+                trav_map_erosion=self.config.get("trav_map_erosion", 2),
+                pybullet_load_texture=self.config.get("pybullet_load_texture", False),
             )
             self.simulator.import_scene(
                 scene, load_texture=self.config.get("load_texture", True)

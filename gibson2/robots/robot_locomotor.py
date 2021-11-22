@@ -289,7 +289,7 @@ class LocomotorRobot(BaseRobot):
 
         # rotate linear and angular velocities to local frame
         lin_vel = rotate_vector_3d(self.get_linear_velocity(), *rpy)
-        ang_vel = rotate_vector_3d(self.get_angular_velocity(), *rpy)
+        ang_vel = self.get_angular_velocity()
 
         state = np.concatenate([pos, rpy, lin_vel, ang_vel, j])
         return state

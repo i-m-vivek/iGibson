@@ -89,7 +89,7 @@ class iGibsonEnv(BaseEnv):
         self.object_randomization_freq = self.config.get(
             "object_randomization_freq", None
         )
-
+        self.embodiment = self.config.get("embodiment", "base")
         # task
         if self.config["task"] == "point_nav_fixed":
             self.task = PointNavFixedTask(self)
@@ -116,11 +116,12 @@ class iGibsonEnv(BaseEnv):
         """
         Load observation space
         """
-        self.sensor_dim = self.config.get('additional_states_dim', 0)
+        self.sensor_dim = self.config.get("additional_states_dim", 0)
         self.auxiliary_sensor_dim = self.config.get("auxiliary_sensor_dim", 0)
         self.output = self.config["output"]
         self.image_width = self.config.get("image_width", 128)
         self.image_height = self.config.get("image_height", 128)
+
         observation_space = OrderedDict()
         sensors = OrderedDict()
         vision_modalities = []
@@ -237,30 +238,22 @@ class iGibsonEnv(BaseEnv):
         self.load_miscellaneous_variables()
 
     def get_additional_states(self):
-        relative_position = self.task.target_pos - self.robots[0].get_position()
-        additional_states = rotate_vector_3d(
-            relative_position, *self.robots[0].get_rpy()
-        )
-        # to get the same input state space for base and arm reaching 
-        # we need to give the end-effector position in
-        # both the case, hence commenting the `if` statement
-        # if "reaching" in self.config["task"]:
-
-        # >>>>>>>>>>>>>>> Temp Comment >>>>>>>>>>>>>>>
-        end_effector_pos = (
-            self.robots[0].get_end_effector_position()
-            - self.robots[0].get_position()
-        )
-        end_effector_pos = rotate_vector_3d(
-            end_effector_pos, *self.robots[0].get_rpy()
-        )
-        additional_states = np.concatenate((additional_states, end_effector_pos))
-        # <<<<<<<<<<<<<<< Temp Comment <<<<<<<<<<<<<<<
+        if self.embodiment == "base":
+            robot_pos = self.robots[0].get_position()
+            _, _, yaw = self.robots[0].get_rpy()
+            additional_states = np.append(robot_pos, yaw)
         
-        assert (
-            len(additional_states) == self.config["additional_states_dim"]
-        ), "additional states dimension mismatch"
-
+        elif self.embodiment == "arm":
+            additional_states = self.robots[0].get_end_effector_position()
+        
+        else:
+            additional_states1 = self.robots[0].get_position()
+            _, _, yaw = self.robots[0].get_rpy()
+            additional_states2 = self.robots[0].get_end_effector_position()
+            additional_states = np.concatenate((additional_states1, additional_states2))
+            additional_states = np.append(additional_states, yaw)
+        
+        assert len(additional_states) == self.sensor_dim, 'additional states dimension mismatch'
         return additional_states
 
     def get_auxiliary_states(self, collision_links=[]):
@@ -282,33 +275,50 @@ class iGibsonEnv(BaseEnv):
             - arm 7
             - gripper 1
             - gripper 2
+        
+        
+        base_pos
+        ee_pos - base_pos
+        proprioceptive_info 
+        yaw, cos(yaw), sin(yaw)
+        target_pos
+        target_pos - base_pos 
+        collision_info
+        
         """
+        assert self.auxiliary_sensor_dim == 94
         auxiliary_sensor = np.zeros(self.auxiliary_sensor_dim)
         robot_state = self.robots[0].calc_state()
-        assert self.auxiliary_sensor_dim == 88
         assert robot_state.shape[0] == 54
-        has_collision = 1.0 if len(collision_links) > 0 else -1.0
+        
         robot_state = self.wrap_to_pi(robot_state, np.arange(12, 54, 3))  # wrap wheel and arm joint pos to [-pi, pi]
-        # the below step is global_to_local
-        end_effector_pos = (
-            self.robots[0].get_end_effector_position() - self.robots[0].get_position()
-        )
+        
+        end_effector_pos = self.robots[0].get_end_effector_position() - self.robots[0].get_position()
         end_effector_pos = rotate_vector_3d(end_effector_pos, *self.robots[0].get_rpy())
+        
         auxiliary_sensor[:3] = robot_state[:3]  # x, y, z,
         auxiliary_sensor[3:5] = robot_state[3:5]  # roll, pitch
         auxiliary_sensor[5:8] = robot_state[6:9]  # vx, vy, vz
         auxiliary_sensor[8:11] = end_effector_pos  # arm_x, arm_y_ arm_z (local)
-        auxiliary_sensor[11:81:5] = robot_state[12:54:3] # pos wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
-        auxiliary_sensor[12:82:5] = robot_state[13:54:3] # vel wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
-        auxiliary_sensor[13:83:5] = robot_state[14:54:3] # trq wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
-        auxiliary_sensor[14:84:5] = np.cos(robot_state[12:54:3]) # cos(pos) wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
-        auxiliary_sensor[15:85:5] = np.sin(robot_state[12:54:3]) # sin(pos) wheel 1, 2, torso, head joint 1, 2, arm joint 1, 2, 3, 4, 5, 6, 7, gripper joint 1, 2
-        auxiliary_sensor[81:84] = robot_state[9:12] # v_roll, v_pitch, v_yaw
+        auxiliary_sensor[11:81:5] = robot_state[12:54:3]  # pos 
+        auxiliary_sensor[12:82:5] = robot_state[13:54:3]  # vel 
+        auxiliary_sensor[13:83:5] = robot_state[14:54:3]  # trq 
+        auxiliary_sensor[14:84:5] = np.cos(robot_state[12:54:3])  # cos(pos) 
+        auxiliary_sensor[15:85:5] = np.sin(robot_state[12:54:3])  # sin(pos) 
+        auxiliary_sensor[81:84] = robot_state[9:12]  # v_roll, v_pitch, v_yaw
 
         roll, pitch, yaw = self.robots[0].get_rpy()
         cos_yaw, sin_yaw = np.cos(yaw), np.sin(yaw)
+
+        target_pos = self.task.get_task_obs(self)
+        robot_pos = self.robots[0].get_position()
+        target_pos_local = rotate_vector_3d(target_pos - robot_pos, roll, pitch, yaw)
+
+        has_collision = 1.0 if len(collision_links) > 0 else -1.0
         auxiliary_sensor[84:87] = np.array([yaw, cos_yaw, sin_yaw])
-        auxiliary_sensor[87] = has_collision
+        auxiliary_sensor[87:90] = target_pos_local
+        auxiliary_sensor[90:93] = target_pos
+        auxiliary_sensor[93] = has_collision
         return auxiliary_sensor
 
     def wrap_to_pi(self, states, indices):
@@ -411,7 +421,7 @@ class iGibsonEnv(BaseEnv):
         state = self.get_state(collision_links)
         info = {}
         reward, info = self.task.get_reward(self, collision_links, action, info)
-        
+
         # -ve electricity reward, independent on the task
         base_moving = np.any(np.abs(action[:2]) >= 0.01)
         arm_moving = np.any(np.abs(action[2:]) >= 0.01)
