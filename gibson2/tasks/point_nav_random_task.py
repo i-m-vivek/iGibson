@@ -28,12 +28,13 @@ class PointNavRandomTask(PointNavFixedTask):
             initial_pos = np.array(self.config["intial_robot_pos"])
         else:
             _, initial_pos = env.scene.get_random_point(floor=self.floor_num)
+        # target_orn = np.random.uniform(-np.pi, np.pi)
         if self.move_arm_only:
-            yaw = np.random.uniform(0, 2*np.pi)
-            angle_offset = np.random.uniform(-np.pi/7, -np.pi/7)
+            yaw = np.random.uniform(0, 2 * np.pi)
+            angle_offset = np.random.uniform(-np.pi / 7, -np.pi / 7)
             dist_offset = np.random.uniform(0.3, 0.75)
-            x_offset = dist_offset*np.cos(yaw + angle_offset)
-            y_offset = dist_offset*np.sin(yaw + angle_offset)
+            x_offset = dist_offset * np.cos(yaw + angle_offset)
+            y_offset = dist_offset * np.sin(yaw + angle_offset)
 
             initial_orn = [0, 0, yaw]
             target_pos = np.array(
@@ -44,6 +45,7 @@ class PointNavRandomTask(PointNavFixedTask):
                 ]
             )
             target_pos = initial_pos + target_pos
+            # return initial_pos, initial_orn, target_pos, target_orn
             return initial_pos, initial_orn, target_pos
         else:
             max_trials = 100
@@ -67,6 +69,7 @@ class PointNavRandomTask(PointNavFixedTask):
             if not (self.target_dist_min < dist < self.target_dist_max):
                 print("WARNING: Failed to sample initial and target positions")
             initial_orn = np.array([0, 0, np.random.uniform(0, np.pi * 2)])
+            # return initial_pos, initial_orn, target_pos, target_orn
             return initial_pos, initial_orn, target_pos
 
     def reset_scene(self, env):
@@ -96,6 +99,7 @@ class PointNavRandomTask(PointNavFixedTask):
                 initial_pos,
                 initial_orn,
                 target_pos,
+                # target_orn,
             ) = self.sample_initial_pose_and_target_pos(env)
             reset_success = env.test_valid_position(
                 env.robots[0], initial_pos, initial_orn
@@ -112,6 +116,7 @@ class PointNavRandomTask(PointNavFixedTask):
         self.target_pos = target_pos
         self.initial_pos = initial_pos
         self.initial_orn = initial_orn
+        # self.target_orn = target_orn
 
         super(PointNavRandomTask, self).reset_agent(env)
 

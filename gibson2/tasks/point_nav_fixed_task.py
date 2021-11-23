@@ -142,6 +142,7 @@ class PointNavFixedTask(BaseTask):
         :param env: environment instance
         :return: task potential
         """
+        # orn_potential = l2_distance(env.robots[0].get_rpy()[-1], self.target_orn)
         if self.reward_type == "l2":
             return self.get_l2_potential(env)
         elif self.reward_type == "geodesic":

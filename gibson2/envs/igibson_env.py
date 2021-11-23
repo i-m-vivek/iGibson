@@ -310,6 +310,7 @@ class iGibsonEnv(BaseEnv):
         roll, pitch, yaw = self.robots[0].get_rpy()
         cos_yaw, sin_yaw = np.cos(yaw), np.sin(yaw)
 
+        # target_pos, target_orn = self.task.get_task_obs(self)
         target_pos = self.task.get_task_obs(self)
         robot_pos = self.robots[0].get_position()
         target_pos_local = rotate_vector_3d(target_pos - robot_pos, roll, pitch, yaw)
@@ -319,6 +320,8 @@ class iGibsonEnv(BaseEnv):
         auxiliary_sensor[87:90] = target_pos_local
         auxiliary_sensor[90:93] = target_pos
         auxiliary_sensor[93] = has_collision
+        # auxiliary_sensor[94] = target_orn
+        # auxiliary_sensor[95] = target_orn - yaw
         return auxiliary_sensor
 
     def wrap_to_pi(self, states, indices):

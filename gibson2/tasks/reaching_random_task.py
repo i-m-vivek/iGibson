@@ -52,6 +52,9 @@ class ReachingRandomTask(PointNavRandomTask):
         :param env: environment instance
         :return: initial pose and target position
         """
+        # initial_pos, initial_orn, target_pos, target_orn = super(
+        #     ReachingRandomTask, self
+        # ).sample_initial_pose_and_target_pos(env)
         initial_pos, initial_orn, target_pos = super(
             ReachingRandomTask, self
         ).sample_initial_pose_and_target_pos(env)
@@ -61,11 +64,14 @@ class ReachingRandomTask(PointNavRandomTask):
             or self.config["scene"] == "empty_table"
             or self.config["scene"] == "tabletop_planning"
         ):
+            # return initial_pos, initial_orn, target_pos, target_orn
             return initial_pos, initial_orn, target_pos
         else:
             target_pos += np.random.uniform(
                 self.target_height_range[0], self.target_height_range[1]
             )
+            self.target_pos = target_pos
+        # return initial_pos, initial_orn, target_pos, target_orn
         return initial_pos, initial_orn, target_pos
 
     def get_task_obs(self, env):
@@ -75,6 +81,7 @@ class ReachingRandomTask(PointNavRandomTask):
         :param env: environment instance
         :return: task-specific observation
         """
+        # task_obs, goal_orn = super(ReachingRandomTask, self).get_task_obs(env)  # target pos
         task_obs = super(ReachingRandomTask, self).get_task_obs(env)  # target pos
         # only the target pos is required other info are present in the aux information.
         # print(task_obs.shape, task_obs, "\n") # debug statement
@@ -86,4 +93,5 @@ class ReachingRandomTask(PointNavRandomTask):
         # task_obs = np.append(task_obs, end_effector_pos_local)
         # proprioceptive_states = env.robots[0].calc_state()
         # task_obs = np.append(task_obs, proprioceptive_states)
+        # return task_obs, goal_orn
         return task_obs
