@@ -239,19 +239,19 @@ class iGibsonEnv(BaseEnv):
 
     def get_additional_states(self):
         if self.embodiment == "base":
-            robot_pos = self.robots[0].get_position()
-            _, _, yaw = self.robots[0].get_rpy()
-            additional_states = np.append(robot_pos, yaw)
+            additional_states = self.robots[0].get_position()
+            # _, _, yaw = self.robots[0].get_rpy()
+            # additional_states = np.append(robot_pos, yaw)
         
         elif self.embodiment == "arm":
             additional_states = self.robots[0].get_end_effector_position()
         
         else:
             additional_states1 = self.robots[0].get_position()
-            _, _, yaw = self.robots[0].get_rpy()
+            # _, _, yaw = self.robots[0].get_rpy()
             additional_states2 = self.robots[0].get_end_effector_position()
             additional_states = np.concatenate((additional_states1, additional_states2))
-            additional_states = np.append(additional_states, yaw)
+            # additional_states = np.append(additional_states, yaw)
         
         assert len(additional_states) == self.sensor_dim, 'additional states dimension mismatch'
         return additional_states

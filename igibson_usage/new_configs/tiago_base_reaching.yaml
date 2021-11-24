@@ -22,7 +22,7 @@ task: point_nav_random
 target_dist_min: 4.0
 target_dist_max: 20.0
 goal_format: polar
-additional_states_dim: 4 
+additional_states_dim: 3 
 auxiliary_sensor_dim: 94
 
 # reward
