@@ -22,7 +22,7 @@ velocity: 1.0
 embodiment: base_arm
 # task
 task: reaching_random
-target_dist_min: 4.0
+target_dist_min: 0.5
 target_dist_max: 20.0
 goal_format: polar
 additional_states_dim: 6 
