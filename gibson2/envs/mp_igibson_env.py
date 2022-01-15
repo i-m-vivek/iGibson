@@ -32,6 +32,9 @@ class iGibsonMPEnv:
         self.env_action_space = self.env.action_space
         self.motion_planner = MotionPlanningWrapper(self.env)
         self.max_dist_subgoal = 2
+        # negative reward if the metapolicy gives bad subgoals for the motion planner
+        self.base_mp_reward = self.env.config.get("base_mp_reward", -1)
+        self.arm_mp_reward = self.env.config.get("arm_mp_reward", -1)
     # def plan_base_motion(self, goal):
     def reset(self):
         return self.env.reset()
@@ -181,5 +184,36 @@ class iGibsonMPEnv:
         
         return state, reward, done, info
 
+    def do_mp(self, action, emb):
+        """
+        action: (np.array), [x, y, orn]/ [x, y, z]
+        emb: int, 0 = base,  1 = arm
+        """
+        import pdb; pdb.set_trace()
+        base_reward = 0
+        arm_reward = 0 
+
+        if emb == 0: 
+            path = self.motion_planner.plan_base_motion(action)
+            if path is not None:
+                self.motion_planner.dry_run_base_plan(path)
+            else: 
+                base_reward = self.base_mp_reward
+        else:
+            joint_pos = self.motion_planner.get_arm_joint_positions(action)
+            if joint_pos is not None:
+                arm_path = self.motion_planner.plan_arm_motion(joint_pos)
+                if arm_path:
+                    self.motion_planner.dry_run_arm_plan(arm_path)
+                else: 
+                    arm_reward = self.arm_mp_reward
+            else:
+                arm_reward = self.arm_mp_reward
+        
+        apply = np.zeros(self.env.action_space.shape[0])
+        print(apply)
+        state, reward, done, info = self.env.step(apply)
+        reward += arm_reward + base_reward
+        return state, reward, done, info
     # add more functions that are used by PPO agents
     # def action_space(self):
