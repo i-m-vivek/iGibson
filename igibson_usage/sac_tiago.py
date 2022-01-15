@@ -183,7 +183,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
 
         logger.epoch_info(n + 1, J=J, R=R, entropy=E)
 
-    logger.info("Press a button to visualize pendulum")
+    # logger.info("Press a button to visualize pendulum")
     input()
     core.evaluate(n_episodes=5, render=True)
 
