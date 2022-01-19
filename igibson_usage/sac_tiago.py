@@ -1,3 +1,4 @@
+from os import stat
 import numpy as np
 
 import torch
@@ -30,7 +31,7 @@ class CriticNetwork(nn.Module):
             nn.ReLU(),
             nn.AdaptiveAvgPool2d((1, 1)),
         )
-        self._h1 = nn.Linear(n_input, n_features)
+        self._h1 = nn.Linear(64+97+3, n_features)
         self._h2 = nn.Linear(n_features, n_features)
         self._h3 = nn.Linear(n_features, n_output)
 
@@ -39,7 +40,8 @@ class CriticNetwork(nn.Module):
         nn.init.xavier_uniform_(self._h3.weight, gain=nn.init.calculate_gain("linear"))
 
     def forward(self, state, action):
-        # odict_keys(['auxiliary_sensor', 'task_obs', 'depth', 'scan', 'occupancy_grid'])
+        print("AAH they used me!")
+        import pdb; pdb.set_trace()
         aux_n_taskobs = state[:, :97]
         depth = state[:, 97:].view(-1, 1, 224, 224)
         cnn_out = torch.flatten(self.cnn(depth), 1)
@@ -66,7 +68,7 @@ class ActorNetwork(nn.Module):
             nn.ReLU(),
             nn.AdaptiveAvgPool2d((1, 1)),
         )
-        self._h1 = nn.Linear(n_input, n_features)
+        self._h1 = nn.Linear(64+97, n_features)
         self._h2 = nn.Linear(n_features, n_features)
         self._h3 = nn.Linear(n_features, n_output)
 
@@ -74,12 +76,19 @@ class ActorNetwork(nn.Module):
         nn.init.xavier_uniform_(self._h2.weight, gain=nn.init.calculate_gain("relu"))
         nn.init.xavier_uniform_(self._h3.weight, gain=nn.init.calculate_gain("linear"))
 
+        # cnn init taken from HRL4IN
+        for layer in self.cnn:
+            if isinstance(layer, (nn.Conv2d, nn.Linear)):
+                nn.init.orthogonal_(layer.weight, gain=1)
+                nn.init.constant_(layer.bias, val=0)
+            
     def forward(self, state):
+        state = state.float()
         aux_n_taskobs = state[:, :97]
         depth = state[:, 97: ].view(-1, 1, 224, 224)
         cnn_out = torch.flatten(self.cnn(depth), 1)
-        state = torch.cat((aux_n_taskobs.float(), cnn_out.float()), dim=1)
-        features1 = F.relu(self._h1(torch.squeeze(state, 1).float()))
+        out = torch.cat((aux_n_taskobs.float(), cnn_out.float()), dim=1)
+        features1 = F.relu(self._h1(out.float()))
         features2 = F.relu(self._h2(features1))
         a = self._h3(features2)
 
@@ -101,10 +110,10 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
 
     # Settings
     initial_replay_size = 256
-    max_replay_size = 50000
+    max_replay_size = 250
     batch_size = 128
     n_features = 128
-    warmup_transitions = 500
+    warmup_transitions = 100
     tau = 0.005 # not need to tweak much
     lr_alpha = 3e-4 # learning rate for alpha, don't need to change much
 
@@ -183,13 +192,8 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
 
         logger.epoch_info(n + 1, J=J, R=R, entropy=E)
 
-    # logger.info("Press a button to visualize pendulum")
-    input()
-    core.evaluate(n_episodes=5, render=True)
-
-
 if __name__ == "__main__":
     algs = [SAC]
 
     for alg in algs:
-        experiment(alg=alg, n_epochs=100, n_steps=1024, n_steps_test=3)
+        experiment(alg=alg, n_epochs=40, n_steps=1000, n_steps_test=2000)

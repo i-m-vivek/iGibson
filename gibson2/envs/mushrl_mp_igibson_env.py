@@ -53,7 +53,7 @@ class iGibsonMPEnv(Environment):
                         -1,
                     )
                 )
-        self._state = np.concatenate(state_list)
+        self._state = np.concatenate(state_list).astype(np.float32)
 
         self.env_action_space = self.env.action_space
         self.motion_planner = MotionPlanningWrapper(self.env)
@@ -64,11 +64,54 @@ class iGibsonMPEnv(Environment):
 
     def reset(self, state=None):
         if state is None:
-            self._state = self.env.reset()
+            raw_state = self.env.reset()
+            state_list = []
+            for k in raw_state.keys():
+                if (
+                    k != "occupancy_grid"
+                    and k in self.env.observation_space.spaces.keys()
+                ):
+                    state_list.append(
+                        raw_state[k].reshape(
+                            -1,
+                        )
+                    )
+            self._state = np.concatenate(state_list).astype(np.float32)
         else:
             self._state = state
         return self._state
 
+    def step(self, action):
+        """
+        3 dim action
+        (x, y, orn)
+        """
+
+        base_reward = 0
+
+        path = self.motion_planner.plan_base_motion(action[:3])
+        if path is not None:
+            self.motion_planner.dry_run_base_plan(path)
+        else:
+            base_reward = self.base_mp_reward
+
+        apply = np.zeros(self.env.action_space.shape[0])
+        raw_state, reward, done, info = self.env.step(apply)
+
+        state_list = []
+        for k in raw_state.keys():
+            if k != "occupancy_grid" and k in self.env.observation_space.spaces.keys():
+                state_list.append(
+                    raw_state[k].reshape(
+                        -1,
+                    )
+                )
+        self._state = np.concatenate(state_list).astype(np.float32)
+
+        reward += base_reward
+        return self._state, reward, done, info
+
+    # With both arm and base motion planner
     # def step(self, action):
     #     """
     #     7 dim action
@@ -104,37 +147,7 @@ class iGibsonMPEnv(Environment):
     #     for k in raw_state.keys():
     #         if k!= "occupancy_grid" and k in self.env.observation_space.spaces.keys():
     #             state_list.append(raw_state[k].reshape(-1, ))
-    #     self._state = np.concatenate(state_list)
+    #     self._state = np.concatenate(state_list).astype(np.float32)
 
     #     reward += arm_reward + base_reward
     #     return self._state, reward, done, info
-
-    def step(self, action):
-        """
-        3 dim action
-        (x, y, orn, x_ee, y_ee, z_ee, embodiment)
-        """
-
-        base_reward = 0
-
-        path = self.motion_planner.plan_base_motion(action[:3])
-        if path is not None:
-            self.motion_planner.dry_run_base_plan(path)
-        else:
-            base_reward = self.base_mp_reward
-
-        apply = np.zeros(self.env.action_space.shape[0])
-        raw_state, reward, done, info = self.env.step(apply)
-
-        state_list = []
-        for k in raw_state.keys():
-            if k != "occupancy_grid" and k in self.env.observation_space.spaces.keys():
-                state_list.append(
-                    raw_state[k].reshape(
-                        -1,
-                    )
-                )
-        self._state = np.concatenate(state_list)
-
-        reward += base_reward
-        return self._state, reward, done, info
