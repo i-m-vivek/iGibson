@@ -43,7 +43,7 @@ class CriticNetwork(nn.Module):
         print("AAH they used me!")
         import pdb; pdb.set_trace()
         aux_n_taskobs = state[:, :97]
-        depth = state[:, 97:].view(-1, 1, 224, 224)
+        depth = state[:, 97:].view(-1, 1, 128, 128)
         cnn_out = torch.flatten(self.cnn(depth), 1)
         state_action = torch.cat((aux_n_taskobs.float(), cnn_out.float(), action.float()), dim=1)
         features1 = F.relu(self._h1(state_action))
@@ -85,7 +85,7 @@ class ActorNetwork(nn.Module):
     def forward(self, state):
         state = state.float()
         aux_n_taskobs = state[:, :97]
-        depth = state[:, 97: ].view(-1, 1, 224, 224)
+        depth = state[:, 97: ].view(-1, 1, 128, 128)
         cnn_out = torch.flatten(self.cnn(depth), 1)
         out = torch.cat((aux_n_taskobs.float(), cnn_out.float()), dim=1)
         features1 = F.relu(self._h1(out.float()))
@@ -111,8 +111,8 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     # Settings
     initial_replay_size = 256
     max_replay_size = 250
-    batch_size = 128
-    n_features = 128
+    batch_size = 8
+    n_features = 8
     warmup_transitions = 100
     tau = 0.005 # not need to tweak much
     lr_alpha = 3e-4 # learning rate for alpha, don't need to change much
