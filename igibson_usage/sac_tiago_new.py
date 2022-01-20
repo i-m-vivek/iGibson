@@ -81,6 +81,7 @@ class ActorNetwork(nn.Module):
                 nn.init.constant_(layer.bias, val=0)
             
     def forward(self, state):
+        print(state.shape)
         state = state.float()
         aux_n_taskobs = state[:, :97]
         depth = state[:, 97: ].view(-1, 1, 128, 128)
