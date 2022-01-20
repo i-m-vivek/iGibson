@@ -173,6 +173,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
 
     J = np.mean(compute_J(dataset, mdp.info.gamma))
     R = np.mean(compute_J(dataset))
+    s = s[:batch_size, :]
     E = agent.policy.entropy(s)
 
     logger.epoch_info(0, J=J, R=R, entropy=E)
@@ -186,6 +187,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
 
         J = np.mean(compute_J(dataset, mdp.info.gamma))
         R = np.mean(compute_J(dataset))
+        s = s[:batch_size, :]
         E = agent.policy.entropy(s)
 
         logger.epoch_info(n + 1, J=J, R=R, entropy=E)
