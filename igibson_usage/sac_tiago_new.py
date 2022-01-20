@@ -39,7 +39,6 @@ class CriticNetwork(nn.Module):
         nn.init.xavier_uniform_(self._h3.weight, gain=nn.init.calculate_gain("linear"))
 
     def forward(self, state, action):
-        print("Using the critic!")
         aux_n_taskobs = state[:, :97]
         depth = state[:, 97:].view(-1, 1, 128, 128)
         cnn_out = torch.flatten(self.cnn(depth), 1)
@@ -81,7 +80,6 @@ class ActorNetwork(nn.Module):
                 nn.init.constant_(layer.bias, val=0)
             
     def forward(self, state):
-        print(state.shape)
         state = state.float()
         aux_n_taskobs = state[:, :97]
         depth = state[:, 97: ].view(-1, 1, 128, 128)
@@ -90,7 +88,6 @@ class ActorNetwork(nn.Module):
         features1 = F.relu(self._h1(out.float()))
         features2 = F.relu(self._h2(features1))
         a = self._h3(features2)
-
         return a
 
 def experiment(alg, n_epochs, n_steps, n_steps_test):
@@ -108,11 +105,11 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     )
 
     # Settings
-    initial_replay_size = 64
+    initial_replay_size = 256
     max_replay_size = 50000
     batch_size = 64
     n_features = 64
-    warmup_transitions = 100
+    warmup_transitions = 256
     tau = 0.005
     lr_alpha = 3e-4
 
@@ -197,4 +194,4 @@ if __name__ == "__main__":
     algs = [SAC]
 
     for alg in algs:
-        experiment(alg=alg, n_epochs=40, n_steps=1000, n_steps_test=2000)
+        experiment(alg=alg, n_epochs=40, n_steps=1024, n_steps_test=1024)
