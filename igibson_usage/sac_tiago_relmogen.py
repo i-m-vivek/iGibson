@@ -93,7 +93,7 @@ class ActorNetwork(nn.Module):
 def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
 
-    logger = Logger(alg.__name__, results_dir=None)
+    logger = Logger(alg.__name__ + "_base", results_dir="relmogen_exps/", log_console=True)
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
 
@@ -101,14 +101,14 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     horizon = 200
     gamma = 0.99
     mdp = iGibsonMPEnv(
-        config_file="configs/tiago_motion_planning.yaml", horizon=horizon, gamma=gamma
+        config_file="new_configs/tiago_base_reaching_relmogen.yaml", horizon=horizon, gamma=gamma
     )
 
     # Settings
-    initial_replay_size = 256
+    initial_replay_size = 512
     max_replay_size = 50000
-    batch_size = 64
-    n_features = 64
+    batch_size = 256
+    n_features = 256
     warmup_transitions = 256
     tau = 0.005
     lr_alpha = 3e-4
@@ -188,10 +188,14 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
         E = agent.policy.entropy(s)
 
         logger.epoch_info(n + 1, J=J, R=R, entropy=E)
+        logger.log_best_agent(agent, J)
 
+    logger.log_agent(agent)
+    logger.log_dataset(dataset)
+    logger.info("Experiment Terminated")
 
 if __name__ == "__main__":
     algs = [SAC]
 
     for alg in algs:
-        experiment(alg=alg, n_epochs=40, n_steps=1024, n_steps_test=1024)
+        experiment(alg=alg, n_epochs=100, n_steps=1024, n_steps_test=1024)

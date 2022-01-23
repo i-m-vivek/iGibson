@@ -39,7 +39,7 @@ class iGibsonMPEnv(Environment):
         observation_space = Box(-np.inf, np.inf, (obs_shape,))
         # action_space = Box(-np.inf, np.inf, (7, )) # (x, y, orn, x_ee, y_ee, z_ee, embodiment)
         action_space = Box(
-            -5, 5, (3,)
+            np.array([-5.0, -5.0, -np.pi]), np.array([5.0, 5.0, np.pi]), (3,)
         )  # (x, y, orn, x_ee, y_ee, z_ee, embodiment)
         mdp_info = MDPInfo(observation_space, action_space, gamma, horizon)
         super().__init__(mdp_info)
