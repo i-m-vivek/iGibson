@@ -23,6 +23,7 @@ class StaticTableTopScene(IndoorScene):
         max_change,
         table_height,
         table_scale,
+        random_pt_on_table,
         trav_map_resolution=0.1,
         trav_map_erosion=2,
         trav_map_type="with_obj",
@@ -43,6 +44,7 @@ class StaticTableTopScene(IndoorScene):
             pybullet_load_texture=pybullet_load_texture,
         )
         logging.info("StaticIndoorScene scene: {}".format(scene_id))
+        self.random_pt_on_table= random_pt_on_table
         self.table_urdf_path = os.path.join(
             gibson2.g_dataset_path, scene_id, "table", "table.urdf"
         )
@@ -74,7 +76,6 @@ class StaticTableTopScene(IndoorScene):
         return 0
 
 
-# TODO: Check whether scene without the below code is working fine or not.
     def get_random_point(self, floor=None):
         """
         Get a random point in the region of table top
@@ -84,21 +85,25 @@ class StaticTableTopScene(IndoorScene):
         max_change: the maximum distance to go from the center of the table
         table_height: Hieght of the table
         """
-        random_pt = np.array(
-            [
-                self.table_pos[0]
-                + np.random.choice(
-                    [np.random.uniform(-0.35, -0.5), np.random.uniform(0.35, 0.5)]
-                ),
-                self.table_pos[1]
-                + np.random.choice(
-                    [np.random.uniform(-0.35, -0.5), np.random.uniform(0.35, 0.5)]
-                ),
-                self.table_height,
-            ]
-        )
-        # print(random_pt)
-        return floor, random_pt
+        if self.random_pt_on_table:
+            random_pt = np.array(
+                [
+                    self.table_pos[0]
+                    + np.random.choice(
+                        [np.random.uniform(-0.35, -0.5), np.random.uniform(0.35, 0.5)]
+                    ),
+                    self.table_pos[1]
+                    + np.random.choice(
+                        [np.random.uniform(-0.35, -0.5), np.random.uniform(0.35, 0.5)]
+                    ),
+                    self.table_height,
+                ]
+            )
+            # print(random_pt)
+            return floor, random_pt
+        else: 
+            return super(StaticTableTopScene, self).get_random_point(floor)
+
 
 # def get_shortest_path(self, floor, source_world, target_world, entire_path=False):
 #     """

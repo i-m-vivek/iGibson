@@ -158,6 +158,7 @@ class BaseEnv(gym.Env):
                 max_change=self.config.get("max_change", 0.5),
                 table_height=self.config.get("table_height", 0.5),
                 table_scale=self.config.get("table_scaling", 2),
+                random_pt_on_table=self.config.get("random_pt_on_table", True),
                 waypoint_resolution=self.config.get("waypoint_resolution", 0.2),
                 num_waypoints=self.config.get("num_waypoints", 10),
                 build_graph=self.config.get("build_graph", False),

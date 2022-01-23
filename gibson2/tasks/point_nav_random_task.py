@@ -60,15 +60,12 @@ class PointNavRandomTask(PointNavFixedTask):
                         entire_path=False,
                     )
                 else:
-                    # print(initial_pos, target_pos)
                     dist = l2_distance(initial_pos, target_pos)
-                    # print(dist)
-                # TODO: not sure why the loop does not break even if the dist is in the range.
                 if self.target_dist_min < dist < self.target_dist_max:
                     break
             if not (self.target_dist_min < dist < self.target_dist_max):
                 print("WARNING: Failed to sample initial and target positions")
-            initial_orn = np.array([0, 0, np.random.uniform(0, np.pi * 2)])
+            initial_orn = np.array([0, 0, np.random.uniform(-np.pi, np.pi)])
             # return initial_pos, initial_orn, target_pos, target_orn
             return initial_pos, initial_orn, target_pos
 
