@@ -98,7 +98,7 @@ def experiment(alg, n_eval_episodes, load_path):
     horizon = 200
     gamma = 0.99
     mdp = iGibsonMPEnv(
-        config_file="new_configs/tiago_base_reaching_relmogen.yaml", horizon=horizon, gamma=gamma
+        config_file="new_configs/tiago_base_reaching_relmogen.yaml", horizon=horizon, gamma=gamma, mode="gui"
     )
 
     # Settings
@@ -169,4 +169,4 @@ if __name__ == "__main__":
     algs = [SAC]
 
     for alg in algs:
-        experiment(alg=alg, n_eval_episodes=50, load_path="relmogen_exps/SAC_base")
+        experiment(alg=alg, n_eval_episodes=50, load_path="relmogen_exps/SAC_base/agent-best.msh")
