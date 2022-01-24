@@ -1,0 +1,83 @@
+# Taken from -> gibson2/examples/configs/turtlebot_point_nav_stadium.yaml
+# scene
+scene: tabletop_planning
+scene_id: TableTop
+build_graph: true
+load_texture: true
+pybullet_load_texture: true
+trav_map_type: with_obj
+trav_map_resolution: 0.1
+trav_map_erosion: 3
+random_pt_on_table: true
+
+# domain randomization
+texture_randomization_freq: null
+object_randomization_freq: null
+
+# robot
+robot: Tiago_Single
+wheel_velocity: 0.8
+torso_lift_velocity: 0.8
+arm_velocity: 0.8
+is_discrete: false
+velocity: 1.0
+intial_robot_pos: [0.,0.,0.]
+# task
+task: reaching_random
+target_dist_min: 1.0
+target_dist_max: 5.0
+goal_format: polar
+additional_states_dim: 3 
+auxiliary_sensor_dim: 94
+
+# reward
+reward_type: l2
+success_reward: 10.0
+potential_reward_weight: 1.0
+collision_reward_weight: 0
+
+# discount factor
+discount_factor: 0.99
+
+# termination condition
+dist_tol: 0.2 # distance tolerance
+max_step: 1000
+max_collisions_allowed: 5000
+
+# misc config
+initial_pos_z_offset: 0.1
+collision_ignore_link_a_ids: []  # ignore collisions with these robot links
+
+# sensor spec
+output: [depth, occupancy_grid, auxiliary_sensor]
+auxiliary_sensor_dim: 94
+# image
+# ASUS Xtion PRO LIVE
+# https://www.asus.com/us/3D-Sensor/Xtion_PRO_LIVE
+fisheye: false
+image_width: 128
+image_height: 128
+vertical_fov: 90
+# depth
+depth_low: 0.35
+depth_high: 3.0
+# scan
+# Hokuyo URG-04LX-UG01
+# https://www.hokuyo-aut.jp/search/single.php?serial=166
+# n_horizontal_rays is originally 683, sub-sampled 1/3
+occupancy_range: 50
+n_horizontal_rays: 228
+n_vertical_beams: 1
+laser_linear_range: 5.6
+laser_angular_range: 240.0
+min_laser_dist: 0.05
+laser_link_name: rgbd_laser_link
+
+# sensor noise
+depth_noise_rate: 0.0
+scan_noise_rate: 0.0
+
+# visual objects
+visual_marker: sphere
+visual_object_at_initial_target_pos: true
+target_visual_object_visible_to_agent: false
