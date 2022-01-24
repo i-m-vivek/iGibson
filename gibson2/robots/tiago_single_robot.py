@@ -107,6 +107,12 @@ class Tiago_Single(LocomotorRobot):
     def get_end_effector_index(self):
         return self.parts["gripper_grasping_frame"].body_part_index
 
+    def end_effector_part_index(self):
+        """
+        Get end-effector link id
+        """
+        return self.parts['gripper_link'].body_part_index
+
     def load(self):
         ids = super(Tiago_Single, self).load()
         robot_id = self.robot_ids[0]
@@ -139,6 +145,7 @@ class Tiago_Single(LocomotorRobot):
             ["head", "arm"],
             ["head", "wrist"],
             ["head", "gripper"],
+            ["wrist", "gripper"],
 
             ["torso_fixed_link", "arm_1_link"],
             ["torso_lift_link", "arm_1_link"],
@@ -183,6 +190,10 @@ class Tiago_Single(LocomotorRobot):
                         self.parts[partb].body_part_index,
                         0,
                     )
+
+        self.all_joints = get_movable_joints(robot_id)
+        valid_joints = [j.joint_index for j in self.ordered_joints]
+        self.joint_mask = [j in valid_joints for j in self.all_joints]
         return ids
 
     # def load(self):

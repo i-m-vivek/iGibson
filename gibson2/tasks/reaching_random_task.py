@@ -16,7 +16,7 @@ class ReachingRandomTask(PointNavRandomTask):
 
     def __init__(self, env):
         super(ReachingRandomTask, self).__init__(env)
-        self.target_height_range = self.config.get("target_height_range", [0.0, 1.0])
+        self.target_height_range = self.config.get("target_height_range", [0.0, 0.8])
         assert isinstance(self.termination_conditions[-1], PointGoal)
         self.termination_conditions[-1] = ReachingGoal(self.config)
         assert isinstance(self.reward_functions[-1], PointGoalReward)

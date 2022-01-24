@@ -4,8 +4,8 @@ import time
 
 INF = float('inf')
 
-RRT_ITERATIONS = 500
-RRT_RESTARTS = 2
+RRT_ITERATIONS = 1000
+RRT_RESTARTS = 4 # number of fresh attemp RRT makes, earlier was 2 only
 RRT_SMOOTHING = 20
 
 

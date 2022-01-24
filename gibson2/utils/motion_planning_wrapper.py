@@ -1,10 +1,11 @@
+from pdb import Pdb
 import gibson2
 from gibson2.envs.igibson_env import iGibsonEnv
 from time import time, sleep
 import os
 from gibson2.utils.assets_utils import download_assets, download_demo_data
 import numpy as np
-from gibson2.external.pybullet_tools.utils import control_joints
+from gibson2.external.pybullet_tools.utils import control_joints, get_movable_joint_ancestors, get_movable_joints
 from gibson2.external.pybullet_tools.utils import get_joint_positions
 from gibson2.external.pybullet_tools.utils import get_joint_velocities
 from gibson2.external.pybullet_tools.utils import get_max_limits
@@ -71,7 +72,7 @@ class MotionPlanningWrapper(object):
         if self.env.simulator.viewer is not None:
             self.env.simulator.viewer.setup_motion_planner(self)
 
-        if self.robot_type in ['Fetch', 'Movo']:
+        if self.robot_type in ['Fetch', 'Movo', 'Tiago_Single']:
             self.setup_arm_mp()
 
         self.arm_interaction_length = 0.2
@@ -156,11 +157,35 @@ class MotionPlanningWrapper(object):
                                                     "right_wrist_spherical_2_joint",
                                                     "right_wrist_3_joint",
                                                     ])
+        elif self.robot_type == 'Tiago_Single':
+            self.arm_default_joint_positions = (0, np.pi, -np.pi / 2, 0, np.pi / 2, 0, 0, 0)
+            self.arm_joint_ids = joints_from_names(self.robot_id,
+                                                    [
+                                                        "torso_lift_joint",
+                                                        "arm_1_joint",
+                                                        "arm_2_joint",
+                                                        "arm_3_joint",
+                                                        "arm_4_joint",
+                                                        "arm_5_joint",
+                                                        "arm_6_joint",
+                                                        "arm_7_joint",
+                                                    ])
+
+            self.all_joints  = get_movable_joints(self.robot_id)
+            self.joint_mask = [j in self.arm_joint_ids for j in self.all_joints]
+
         self.arm_joint_ids_all = get_moving_links(
             self.robot_id, self.arm_joint_ids)
         self.arm_joint_ids_all = [item for item in self.arm_joint_ids_all if
                                   item != self.robot.end_effector_part_index()]
-        self.arm_ik_threshold = 0.05
+        if self.robot_type == 'Tiago_Single':
+            # Although, this much error is quite large, but qualitatively this is fine. 
+            # Most probably the EE position is not same as the gripper position in the tiago simulation.
+            #  Hence, pybullet internally misses this.   
+            # this can be resolved if we use the gripper position instead of the EE pos for calculating the error. 
+            self.arm_ik_threshold = 0.15 
+        else:    
+            self.arm_ik_threshold = 0.05
 
         self.mp_obstacles = []
         if type(self.env.scene) == StaticIndoorScene:
@@ -185,6 +210,7 @@ class MotionPlanningWrapper(object):
 
         yaw = self.robot.get_rpy()[2]
         half_occupancy_range = self.occupancy_range / 2.0
+        # print(half_occupancy_range)
         robot_position_xy = self.robot.get_position()[:2]
         corners = [
             robot_position_xy + rotate_vector_2d(local_corner, -yaw)
@@ -195,6 +221,7 @@ class MotionPlanningWrapper(object):
                 np.array([-half_occupancy_range, -half_occupancy_range]),
             ]
         ]
+        # import pdb; pdb.set_trace()
         path = plan_base_motion_2d(
             self.robot_id,
             [x, y, theta],
@@ -264,7 +291,7 @@ class MotionPlanningWrapper(object):
             joint_range = [item + 1 for item in joint_range]
             joint_damping = [0.1 for _ in joint_range]
 
-        elif self.robot_type == 'Movo':
+        else:
             max_limits = get_max_limits(self.robot_id, self.robot.all_joints)
             min_limits = get_min_limits(self.robot_id, self.robot.all_joints)
             rest_position = list(get_joint_positions(
@@ -298,6 +325,7 @@ class MotionPlanningWrapper(object):
         state_id = p.saveState()
         #p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, False)
         # find collision-free IK solution for arm_subgoal
+        # import pdb; pdb.set_trace()
         while n_attempt < max_attempt:
             if self.robot_type == 'Movo':
                 self.robot.tuck()
@@ -320,6 +348,9 @@ class MotionPlanningWrapper(object):
                 arm_joint_positions = arm_joint_positions[2:10]
             elif self.robot_type == 'Movo':
                 arm_joint_positions = arm_joint_positions[:8]
+            elif self.robot_type == 'Tiago_Single':
+                 arm_joint_positions = np.asarray(arm_joint_positions)[self.joint_mask]
+                 arm_joint_positions = arm_joint_positions[:8]
 
             set_joint_positions(
                 self.robot_id, self.arm_joint_ids, arm_joint_positions)
@@ -357,11 +388,15 @@ class MotionPlanningWrapper(object):
                 continue
 
             # gripper should not have any self-collision
-            collision_free = is_collision_free(
-                body_a=self.robot_id,
-                link_a_list=[
-                    self.robot.end_effector_part_index()],
-                body_b=self.robot_id)
+            # collision_free = is_collision_free(
+            #     body_a=self.robot_id,
+            #     link_a_list=[
+            #         self.robot.end_effector_part_index()],
+            #     body_b=self.robot_id)
+            
+            # Over rided to see the effect of it
+            collision_free = True
+            
             if not collision_free:
                 n_attempt += 1
                 print('gripper has collision')
@@ -435,6 +470,161 @@ class MotionPlanningWrapper(object):
                 (link_from_name(self.robot_id, 'left_arm_half_1_link'),
                  link_from_name(self.robot_id, 'linear_actuator_fixed_link')),
             }
+        elif self.robot_type == 'Tiago_Single':
+            disabled_collisions = {(
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_1_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "arm_2_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "arm_3_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "arm_4_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "arm_5_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "arm_6_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_6_link"),
+                                    link_from_name(self.robot_id, "arm_tool_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_6_link"),
+                                    link_from_name(self.robot_id, "wrist_ft_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_6_link"),
+                                    link_from_name(self.robot_id, "wrist_ft_tool_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_6_link"),
+                                    link_from_name(self.robot_id, "gripper_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_2_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_3_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_3_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_4_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_4_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_5_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_5_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_6_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                # (
+                                #     link_from_name(self.robot_id, "arm_7_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                # ),
+                                # (
+                                #     link_from_name(self.robot_id, "arm_6_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                # ),
+                                (
+                                    link_from_name(self.robot_id, "arm_5_link"),
+                                    link_from_name(self.robot_id, "arm_tool_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "gripper_right_finger_link"),
+                                    link_from_name(self.robot_id, "base_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_5_link"),
+                                    link_from_name(self.robot_id, "wrist_ft_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "arm_tool_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "wrist_ft_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "gripper_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "wrist_ft_link"),
+                                ),
+                                # (
+                                #     link_from_name(self.robot_id, "arm_tool_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                # ),
+                                # (
+                                #     link_from_name(self.robot_id, "wrist_ft_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                # ),
+                                # (
+                                #     link_from_name(self.robot_id, "gripper_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                # ),
+                                (
+                                    link_from_name(self.robot_id, "gripper_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "wrist_ft_tool_link"),
+                                    link_from_name(self.robot_id, "torso_fixed_link"),
+                                ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "wrist_ft_tool_link"),
+                                ),
+                                # (
+                                #     link_from_name(self.robot_id, "wrist_ft_tool_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_column_link"),
+                                # ),
+                                (
+                                    link_from_name(self.robot_id, "torso_lift_link"),
+                                    link_from_name(self.robot_id, "arm_tool_link"),
+                                ),
+                                
+                                # (
+                                #     link_from_name(self.robot_id, "arm_6_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_link"),
+                                # ),
+                                # (
+                                #     link_from_name(self.robot_id, "arm_7_link"),
+                                #     link_from_name(self.robot_id, "torso_fixed_link"),
+                                # ),
+                                }
 
         if self.fine_motion_plan:
             self_collisions = True

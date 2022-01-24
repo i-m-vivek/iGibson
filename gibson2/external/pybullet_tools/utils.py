@@ -2901,12 +2901,12 @@ def get_collision_fn(body, joints, obstacles, attachments, self_collisions, disa
             # Self-collisions should not have the max_distance parameter
             # , **kwargs):
             if pairwise_link_collision(body, link1, body, link2):
-                #print(get_body_name(body), get_link_name(body, link1), get_link_name(body, link2))
+                # print("pairwise_link_collision: ")
                 return True
         for body1, body2 in check_body_pairs:
             if pairwise_collision(body1, body2, **kwargs):
-                # print('body collision', body1, body2)
-                #print(get_body_name(body1), get_body_name(body2))
+                # print('body collision: ', body1, body2)
+                # print(get_body_name(body1), get_body_name(body2))
                 return True
         return False
     return collision_fn
