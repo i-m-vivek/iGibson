@@ -107,7 +107,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     # Settings
     initial_replay_size = 512
     max_replay_size = 50000
-    batch_size = 128
+    batch_size = 64
     n_features = 128
     warmup_transitions = 256
     tau = 0.005
