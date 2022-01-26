@@ -89,7 +89,9 @@ class iGibsonMPEnv(Environment):
 
         base_reward = 0
         arm_reward = 0
-        emb= action[-1] < 0.5
+        # emb= action[-1] < 0.5
+        emb = True # over-riding to check whether there is a bug in the code or not.
+        
         if emb == True:
 
             path = self.motion_planner.plan_base_motion(action[:3])

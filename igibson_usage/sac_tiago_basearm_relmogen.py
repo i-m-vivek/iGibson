@@ -98,7 +98,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
 
     logger = Logger(
-        alg.__name__ + "_basearm", results_dir="relmogen_exps/", log_console=True
+        alg.__name__ + "_basearm_baseonly", results_dir="relmogen_exps/", log_console=True
     )
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
