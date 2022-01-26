@@ -30,7 +30,7 @@ class CriticNetwork(nn.Module):
             nn.ReLU(),
             nn.AdaptiveAvgPool2d((1, 1)),
         )
-        self._h1 = nn.Linear(64+94+7, n_features)
+        self._h1 = nn.Linear(64 + 94 + 7, n_features)
         self._h2 = nn.Linear(n_features, n_features)
         self._h3 = nn.Linear(n_features, n_output)
 
@@ -42,12 +42,15 @@ class CriticNetwork(nn.Module):
         aux_n_taskobs = state[:, :94]
         depth = state[:, 94:].view(-1, 1, 128, 128)
         cnn_out = torch.flatten(self.cnn(depth), 1)
-        state_action = torch.cat((aux_n_taskobs.float(), cnn_out.float(), action.float()), dim=1)
+        state_action = torch.cat(
+            (aux_n_taskobs.float(), cnn_out.float(), action.float()), dim=1
+        )
         features1 = F.relu(self._h1(state_action))
         features2 = F.relu(self._h2(features1))
         q = self._h3(features2)
 
         return torch.squeeze(q)
+
 
 class ActorNetwork(nn.Module):
     def __init__(self, input_shape, output_shape, n_features, **kwargs):
@@ -65,7 +68,7 @@ class ActorNetwork(nn.Module):
             nn.ReLU(),
             nn.AdaptiveAvgPool2d((1, 1)),
         )
-        self._h1 = nn.Linear(64+94, n_features)
+        self._h1 = nn.Linear(64 + 94, n_features)
         self._h2 = nn.Linear(n_features, n_features)
         self._h3 = nn.Linear(n_features, n_output)
 
@@ -78,11 +81,11 @@ class ActorNetwork(nn.Module):
             if isinstance(layer, (nn.Conv2d, nn.Linear)):
                 nn.init.orthogonal_(layer.weight, gain=1)
                 nn.init.constant_(layer.bias, val=0)
-            
+
     def forward(self, state):
         state = state.float()
         aux_n_taskobs = state[:, :94]
-        depth = state[:, 94: ].view(-1, 1, 128, 128)
+        depth = state[:, 94:].view(-1, 1, 128, 128)
         cnn_out = torch.flatten(self.cnn(depth), 1)
         out = torch.cat((aux_n_taskobs.float(), cnn_out.float()), dim=1)
         features1 = F.relu(self._h1(out.float()))
@@ -90,10 +93,13 @@ class ActorNetwork(nn.Module):
         a = self._h3(features2)
         return a
 
+
 def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
 
-    logger = Logger(alg.__name__ + "_basearm", results_dir="relmogen_exps/", log_console=True)
+    logger = Logger(
+        alg.__name__ + "_basearm", results_dir="relmogen_exps/", log_console=True
+    )
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
 
@@ -101,7 +107,9 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     horizon = 200
     gamma = 0.99
     mdp = iGibsonMPEnv(
-        config_file="new_configs/tiago_basearm_relmogen.yaml", horizon=horizon, gamma=gamma
+        config_file="new_configs/tiago_basearm_relmogen.yaml",
+        horizon=horizon,
+        gamma=gamma,
     )
 
     # Settings
@@ -193,6 +201,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     logger.log_agent(agent)
     logger.log_dataset(dataset)
     logger.info("Experiment Terminated")
+
 
 if __name__ == "__main__":
     algs = [SAC]
