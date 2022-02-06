@@ -3104,6 +3104,7 @@ def get_base_distance_fn(weights=1*np.ones(3)):
 def plan_base_motion(body, end_conf, base_limits, obstacles=[], direct=False,
                      weights=1*np.ones(3), resolutions=0.05*np.ones(3),
                      max_distance=MAX_DISTANCE, **kwargs):
+    import pdb; pdb.set_trace()
     def sample_fn():
         x, y = np.random.uniform(*base_limits)
         theta = np.random.uniform(*CIRCULAR_LIMITS)
@@ -3163,6 +3164,7 @@ def plan_base_motion_2d(body, end_conf, base_limits, map_2d, occupancy_range, gr
                         obstacles=[], weights=1 * np.ones(3), resolutions=0.05 * np.ones(3),
                         max_distance=MAX_DISTANCE, min_goal_dist = 0.02, algorithm='birrt', optimize_iter=0, 
                         **kwargs):
+    # import pdb; pdb.set_trace()
     def sample_fn():
         x, y = np.random.uniform(*base_limits)
         theta = np.random.uniform(*CIRCULAR_LIMITS)
@@ -3208,6 +3210,7 @@ def plan_base_motion_2d(body, end_conf, base_limits, map_2d, occupancy_range, gr
         return None
 
     def collision_fn(q):
+        # import pdb; pdb.set_trace()
         # TODO: update this function
         # set_base_values(body, q)
         # return any(pairwise_collision(body, obs, max_distance=max_distance) for obs in obstacles)

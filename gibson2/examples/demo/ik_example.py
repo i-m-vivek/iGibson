@@ -3,7 +3,7 @@ from gibson2.simulator import Simulator
 from gibson2.scenes.empty_scene import EmptyScene
 from gibson2.utils.utils import parse_config
 from gibson2.render.profiler import Profiler
-
+import os 
 import pybullet as p
 from gibson2.external.pybullet_tools.utils import set_joint_positions, joints_from_names, get_joint_positions, \
     get_max_limits, get_min_limits, get_sample_fn

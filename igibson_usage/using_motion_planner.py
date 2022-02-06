@@ -22,7 +22,7 @@ def run_example(args):
     # print("Robot Position", nav_env.robots[0].get_position())
     # # <<<<< Base Motion
     import pdb; pdb.set_trace()
-    path = motion_planner.plan_base_motion(np.array([-2, -2, 0.1]))
+    path = motion_planner.plan_base_motion(np.array([2, 2, 0.1]))
     print(path)
     # if the path is not found it will return None otherwise it will return the a list of tuple [(x,y,o), (x,y,o), (x,y,o), (x,y,o), ... ]
     if path:

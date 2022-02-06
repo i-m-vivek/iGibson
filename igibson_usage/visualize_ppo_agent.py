@@ -27,7 +27,7 @@ def main():
     args = parser.parse_args()
     device = torch.device("cuda:{}".format(args.pth_gpu_id))
     config_file = os.path.join(
-        os.path.dirname(gibson2.__file__), "../igibson_usage/configs", args.config_file
+        "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/iGibson/igibson_usage/new_configs", args.config_file
     )
     def load_env(env_mode, device_idx):
         return iGibsonEnv(
@@ -88,19 +88,19 @@ def main():
         max_grad_norm=args.max_grad_norm,
         use_clipped_value_loss=True,
     )
-    ckpt_path = "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/trained_model_wts/ckpt.19110.pth"
+    ckpt_path = "/home/vkmittal14/WORKSPACE/TUD/vk_igibson/trained_model_wts/hrl4in_new_exp/ckpt.12000.pth"
     if ckpt_path is not None:
         ckpt = torch.load(ckpt_path, map_location=device)
         agent.load_state_dict(ckpt["state_dict"])
 
     observations = eval_envs.reset()
     batch = batch_obs(observations)
-
     for sensor in batch:
         batch[sensor] = batch[sensor].to(device)
     recurrent_hidden_states = torch.zeros(eval_envs._num_envs, args.hidden_size, device=device)
     masks = torch.zeros(eval_envs._num_envs, 1, device=device)
     for _ in range(50000):
+        import pdb; pdb.set_trace()
         with torch.no_grad():
             _, actions, _, recurrent_hidden_states = actor_critic.act(
                 batch,

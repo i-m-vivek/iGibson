@@ -215,5 +215,8 @@ class iGibsonMPEnv:
         state, reward, done, info = self.env.step(apply)
         reward += arm_reward + base_reward
         return state, reward, done, info
+    
+    def render(self):
+        return None
     # add more functions that are used by PPO agents
     # def action_space(self):
