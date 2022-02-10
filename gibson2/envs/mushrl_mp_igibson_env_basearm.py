@@ -90,9 +90,6 @@ class iGibsonMPEnv(Environment):
         3 dim action
         (x, y, orn, x_ee, y_ee, z_ee, emb)
         """
-        import pdb
-
-        pdb.set_trace()
         base_reward = 0
         arm_reward = 0
         emb = action[-1] < 0.5
