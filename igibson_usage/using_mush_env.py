@@ -2,7 +2,7 @@ import numpy as np
 from gibson2.envs.mushrl_mp_igibson_env_basearm import iGibsonMPEnv
 import pdb
 env = iGibsonMPEnv(
-    config_file="new_configs/tiago_basearm_relmogen.yaml",
+    config_file="new_configs/tiago_basearm_random_reaching_relmogen.yaml",
     mode="gui",
 )
 print(env.info.observation_space.shape)

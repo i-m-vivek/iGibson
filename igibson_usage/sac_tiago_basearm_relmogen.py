@@ -98,7 +98,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
 
     logger = Logger(
-        alg.__name__ + "_basearm_baseonly", results_dir="relmogen_exps/", log_console=True
+        alg.__name__ + "_basearm_stadium", results_dir="relmogen_exps/", log_console=True
     )
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
@@ -107,7 +107,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     horizon = 75
     gamma = 0.99
     mdp = iGibsonMPEnv(
-        config_file="new_configs/tiago_basearm_relmogen.yaml",
+        config_file="new_configs/tiago_basearm_random_reaching_relmogen.yaml",
         horizon=horizon,
         gamma=gamma,
     )
@@ -122,6 +122,16 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     lr_alpha = 3e-4
 
     use_cuda = torch.cuda.is_available()
+    logger.info(f"horizon: {horizon}")
+    logger.info(f"gamma: {gamma}")
+    logger.info(f"initial_replay_size: {initial_replay_size}")
+    logger.info(f"max_replay_size: {max_replay_size}")
+    logger.info(f"batch_size: {batch_size}")
+    logger.info(f"n_features: {n_features}")
+    logger.info(f"warmup_transitions: {warmup_transitions}")
+    logger.info(f"tau: {tau}")
+    logger.info(f"lr_alpha: {lr_alpha}")
+    logger.info(f"n_steps: {n_steps}")
 
     # Approximator
     actor_input_shape = mdp.info.observation_space.shape
