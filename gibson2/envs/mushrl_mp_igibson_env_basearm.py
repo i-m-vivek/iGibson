@@ -90,28 +90,32 @@ class iGibsonMPEnv(Environment):
         3 dim action
         (x, y, orn, x_ee, y_ee, z_ee, emb)
         """
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         base_reward = 0
         arm_reward = 0
-        emb= action[-1] < 0.5
+        emb = action[-1] < 0.5
         # emb = True  # over-riding to check whether there is a bug in the code or not.
         if emb == True:
             # added some offset to have a nice -1.25 to 1.25 model prediction.
-            # We only need need +ve x, y values. 
+            # We only need need +ve x, y values.
             action[0] += 1.25
-            action[1] += 1.25 
+            action[1] += 1.25
 
             robot_pos = self.env.robots[0].get_position()
             _, _, yaw = self.env.robots[0].get_rpy()
-            local_action = np.copy(action[:3])
-            local_action[2] = robot_pos[2] # the output of the agent is x, y and yaw the z does not matter
-            world_in_robot = rotate_vector_3d(
-                np.array([0, 0, robot_pos[2]]) - robot_pos, 0, 0, yaw
+            local_action = np.array([action[0], action[1], robot_pos[2], 1])
+            rotation_mtrx = np.array(
+                [[np.cos(yaw), -np.sin(yaw), 0, robot_pos[0]],
+                [np.sin(yaw), np.cos(yaw), 0, robot_pos[1]],
+                [0, 0, 1, robot_pos[2]],
+                [0, 0, 0, 1]]
             )
-            robot_to_world = rotate_vector_3d(
-                local_action - world_in_robot, 0, 0, 2 * np.pi - yaw
-            )
-            robot_to_world[2] = action[2] # change the z output to orn, and as orn is not in the goal it does not matter
+            robot_to_world = np.matmul(rotation_mtrx, local_action)[:3]
+            robot_to_world[2] = action[
+                2
+            ]  # change the z output to orn, and as orn is not in the goal it does not matter
             path = self.motion_planner.plan_base_motion(robot_to_world)
 
             if path is not None:

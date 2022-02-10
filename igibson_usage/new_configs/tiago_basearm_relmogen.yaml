@@ -21,7 +21,7 @@ torso_lift_velocity: 0.8
 arm_velocity: 0.8
 is_discrete: false
 velocity: 1.0
-intial_robot_pos: [0.,0.,0.]
+intial_robot_pos: [2.,1.,0.]
 # task
 task: reaching_random
 target_dist_min: 1.0
