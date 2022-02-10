@@ -104,7 +104,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     logger.info("Experiment Algorithm: " + alg.__name__)
 
     # MDP
-    horizon = 200
+    horizon = 75
     gamma = 0.99
     mdp = iGibsonMPEnv(
         config_file="new_configs/tiago_basearm_relmogen.yaml",
@@ -114,7 +114,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
 
     # Settings
     initial_replay_size = 512
-    max_replay_size = 50000
+    max_replay_size = 75000
     batch_size = 64
     n_features = 128
     warmup_transitions = 256
@@ -207,4 +207,4 @@ if __name__ == "__main__":
     algs = [SAC]
 
     for alg in algs:
-        experiment(alg=alg, n_epochs=200, n_steps=1024, n_steps_test=1024)
+        experiment(alg=alg, n_epochs=200, n_steps=1024, n_steps_test=512)
