@@ -6,7 +6,9 @@ env = iGibsonMPEnv(
     mode="gui",
 )
 print(env.info.observation_space.shape)
-action = np.array([2, 5, 0.75, 0, 0.4, 0.4, 0.6])
+action = np.array([2.75, 1.75, 0.75, 0, 0.4, 0.4, 0.46])
+env.env.robots[0].set_orientation([0, 0, np.sin(-3*np.pi / 8), np.cos(-3*np.pi / 8)])
+# env.env.robots[0].set_orientation([0, 0, 0, 1])
 while True:
     pdb.set_trace()
     state, reward, done, _ = env.step(action)
