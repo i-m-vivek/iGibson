@@ -104,14 +104,13 @@ class StaticTableTopScene(IndoorScene):
         else: 
             return super(StaticTableTopScene, self).get_random_point(floor)
 
-
-# def get_shortest_path(self, floor, source_world, target_world, entire_path=False):
-#     """
-#     Get a trivial shortest path because the scene is empty
-#     """
-#     logging.warning(
-#         "WARNING: trying to compute the shortest path in EmptyScene (assuming empty space)"
-#     )
-#     shortest_path = np.stack((source_world, target_world))
-#     geodesic_distance = l2_distance(source_world, target_world)
-#     return shortest_path, geodesic_distance
+    # def get_shortest_path(self, floor, source_world, target_world, entire_path=False):
+    #     """
+    #     Get a trivial shortest path because the scene is empty
+    #     """
+    #     logging.warning(
+    #         "WARNING: trying to compute the shortest path in EmptyScene (assuming empty space)"
+    #     )
+    #     shortest_path = np.stack((source_world, target_world))
+    #     geodesic_distance = l2_distance(source_world, target_world)
+    #     return shortest_path, geodesic_distance

@@ -102,10 +102,10 @@ class Tiago_Single(LocomotorRobot):
         set_joint_positions(robot_id, arm_joints, rest_position)
 
     def get_end_effector_position(self):
-        return self.parts["gripper_grasping_frame"].get_position()
+        return self.parts["gripper_link"].get_position()
 
     def get_end_effector_index(self):
-        return self.parts["gripper_grasping_frame"].body_part_index
+        return self.parts["gripper_link"].body_part_index
 
     def end_effector_part_index(self):
         """

@@ -28,8 +28,8 @@ class StadiumScene(Scene):
         pos, orn = p.getBasePositionAndOrientation(self.floor_body_ids[0])
         p.resetBasePositionAndOrientation(
             self.floor_body_ids[0], [pos[0], pos[1], pos[2] - 0.005], orn)
-        p.changeVisualShape(
-            self.floor_body_ids[0], -1, rgbaColor=[1, 1, 1, 0.5])
+        # p.changeVisualShape(
+        #     self.floor_body_ids[0], -1, rgbaColor=[1, 1, 1, 0.5])
         return list(self.stadium) + self.floor_body_ids
 
     def get_random_point(self, floor=None):

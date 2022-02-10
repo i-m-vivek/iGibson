@@ -14,6 +14,7 @@ from gibson2.scenes.stadium_scene import StadiumScene
 from gibson2.scenes.gibson_table_scene import StaticTableTopScene
 from gibson2.scenes.gibson_indoor_scene import StaticIndoorScene
 from gibson2.scenes.igibson_indoor_scene import InteractiveIndoorScene
+from gibson2.scenes.gibson_stadium_scene import StaticStadiumScene
 from gibson2.scenes.empty_table_scene import EmptyTableScene
 from gibson2.utils.utils import parse_config
 from gibson2.render.mesh_renderer.mesh_renderer_settings import MeshRendererSettings
@@ -164,6 +165,21 @@ class BaseEnv(gym.Env):
                 build_graph=self.config.get("build_graph", False),
                 trav_map_resolution=self.config.get("trav_map_resolution", 0.1),
                 trav_map_erosion=self.config.get("trav_map_erosion", 2),
+                pybullet_load_texture=self.config.get("pybullet_load_texture", False),
+            )
+            self.simulator.import_scene(
+                scene, load_texture=self.config.get("load_texture", True)
+            )
+        elif self.config["scene"] == "stadium_planning":
+            scene = StaticStadiumScene(
+                scene_id="Stadium",
+                height_range=self.config.get("height_range", [0.4, 0.55]),
+                waypoint_resolution=self.config.get("waypoint_resolution", 0.2),
+                num_waypoints=self.config.get("num_waypoints", 10),
+                build_graph=self.config.get("build_graph", False),
+                trav_map_resolution=self.config.get("trav_map_resolution", 0.1),
+                trav_map_erosion=self.config.get("trav_map_erosion", 2),
+                trav_map_type=self.config.get("trav_map_type", "with_obj"),
                 pybullet_load_texture=self.config.get("pybullet_load_texture", False),
             )
             self.simulator.import_scene(
