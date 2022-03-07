@@ -41,8 +41,8 @@ class iGibsonMPEnv(Environment):
         observation_space = Box(-np.inf, np.inf, (obs_shape,))
         # action_space = Box(-np.inf, np.inf, (7, )) # (x, y, orn, x_ee, y_ee, z_ee, embodiment)
         action_space = Box(
-            np.array([-1.25, -1.25, -np.pi, -np.pi / 2, 0.5, 0.1, 0]),
-            np.array([1.25, 1.25, np.pi, np.pi / 2, 1.0, 0.8, 1]),
+            np.array([-1.25, -1.25, -np.pi, -np.pi, 0.5, 0.1, 0]),
+            np.array([1.25, 1.25, np.pi, np.pi, 1.0, 0.8, 1]),
             (7,),
         )  # (x, y, orn, degree_ee, distance_ee, height_ee, embodiment), for the arm everything is in robot frame
         mdp_info = MDPInfo(observation_space, action_space, gamma, horizon)
