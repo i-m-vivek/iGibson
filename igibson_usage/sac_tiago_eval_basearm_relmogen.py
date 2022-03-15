@@ -98,7 +98,7 @@ def experiment(alg, n_eval_episodes, load_path):
     np.random.seed()
 
     # MDP
-    horizon = 200
+    horizon = 75
     gamma = 0.99
     mdp = iGibsonMPEnv(
         config_file="new_configs/tiago_basearm_relmogen.yaml",
@@ -109,7 +109,7 @@ def experiment(alg, n_eval_episodes, load_path):
 
     # Settings
     initial_replay_size = 512
-    max_replay_size = 50000
+    max_replay_size = 75000
     batch_size = 64
     n_features = 128
     warmup_transitions = 256
@@ -179,5 +179,5 @@ if __name__ == "__main__":
         experiment(
             alg=alg,
             n_eval_episodes=50,
-            load_path="relmogen_exps/SAC_basearm/agent-best.msh",
+            load_path="/home/vivek/WORKSPACE/TUD/vk_igibson/stadium_basearm_run1.msh",
         )

@@ -24,6 +24,7 @@ target_dist_max: 20.0
 goal_format: polar
 additional_states_dim: 3 
 auxiliary_sensor_dim: 94
+intial_robot_pos: [0.,0.,0.]
 
 # reward
 reward_type: l2
