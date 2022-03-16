@@ -1,4 +1,5 @@
-from gibson2.envs.igibson_env import iGibsonEnv
+# from gibson2.envs.igibson_env import iGibsonEnv
+from gibson2.envs.igibson_env_v2 import iGibsonEnv
 from gibson2.utils.motion_planning_wrapper import MotionPlanningWrapper
 import numpy as np
 import pybullet as p
@@ -7,7 +8,7 @@ from mushroom_rl.utils.spaces import Box, Discrete
 from mushroom_rl.core import Core
 import math
 from gibson2.utils.utils import rotate_vector_3d
-
+import copy 
 
 class iGibsonMPEnv(Environment):
     def __init__(
@@ -92,17 +93,18 @@ class iGibsonMPEnv(Environment):
         """
         base_reward = 0
         arm_reward = 0
-        emb = action[-1] < 0.5
-        # emb = True  # over-riding to check whether there is a bug in the code or not.
+        # emb = action[-1] < 0.5
+        emb = True  # over-riding to check whether there is a bug in the code or not.
         if emb == True:
             # added some offset to have a nice -1.25 to 1.25 model prediction.
             # We only need need +ve x, y values.
-            action[0] += 1.25
-            action[1] += 1.25
+            action_c = copy.deepcopy(action)
+            action_c[0] += 1.25
+            action_c[1] += 1.25
 
             robot_pos = self.env.robots[0].get_position()
             _, _, yaw = self.env.robots[0].get_rpy()
-            local_action = np.array([action[0], action[1], robot_pos[2], 1])
+            local_action = np.array([action_c[0], action_c[1], robot_pos[2], 1])
             rotation_mtrx = np.array(
                 [[np.cos(yaw), -np.sin(yaw), 0, robot_pos[0]],
                 [np.sin(yaw), np.cos(yaw), 0, robot_pos[1]],
@@ -110,9 +112,7 @@ class iGibsonMPEnv(Environment):
                 [0, 0, 0, 1]]
             )
             robot_to_world = np.matmul(rotation_mtrx, local_action)[:3]
-            robot_to_world[2] = action[
-                2
-            ]  # change the z output to orn, and as orn is not in the goal it does not matter
+            robot_to_world[2] = yaw + action_c[2]  # change the z output to orn, and as orn is not in the goal it does not matter
             path = self.motion_planner.plan_base_motion(robot_to_world)
 
             if path is not None:
