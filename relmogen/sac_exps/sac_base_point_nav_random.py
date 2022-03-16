@@ -1,7 +1,7 @@
 from re import M
 from statistics import mode
 import numpy as np
-
+import time 
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -16,7 +16,8 @@ from gibson2.envs.mushrl_mp_igibson_env_basearm import iGibsonMPEnv
 from tqdm import trange
 import wandb
 
-wandb.init(project= "tud-project", entity="vassist")
+start_time = str(time.strftime("%Y%m%d-%H%M%S"))
+wandb.init(project="tud-project", entity="vassist", id = start_time)
 
 class CriticNetwork(nn.Module):
     def __init__(self, input_shape, output_shape, n_features, **kwargs):
@@ -32,9 +33,7 @@ class CriticNetwork(nn.Module):
         nn.init.xavier_uniform_(self._h2.weight, gain=nn.init.calculate_gain("relu"))
 
     def forward(self, state, action):
-        state_action = torch.cat(
-            (state.float(),  action.float()), dim=1
-        )
+        state_action = torch.cat((state.float(), action.float()), dim=1)
         features1 = F.relu(self._h1(state_action))
         q = self._h2(features1)
 
@@ -63,20 +62,18 @@ class ActorNetwork(nn.Module):
 def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
     dirname = alg.__name__ + "_base_point_nav_random_stadium"
-    logger = Logger(
-        dirname, results_dir="relmogen_exps/", log_console=True
-    )
+    logger = Logger(dirname, results_dir="relmogen_exps/", log_console=True)
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
 
     # MDP
-    horizon = 100
+    horizon = 20
     gamma = 0.99
     mdp = iGibsonMPEnv(
-        config_file="../../igibson_usage/new_configs/tiago_base_point_nav_random_relmogen.yaml",
+        config_file="/home/vivek/WORKSPACE/TUD/vk_igibson/igibson_new/iGibson/igibson_usage/new_configs/tiago_base_point_nav_random_relmogen.yaml",
         horizon=horizon,
         gamma=gamma,
-        # mode="gui"
+        mode="gui"
     )
 
     # Settings
@@ -92,12 +89,12 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
 
     wandb.config = {
         "initial_replay_size": initial_replay_size,
-        "max_replay_size": max_replay_size, 
-        "batch_size": batch_size, 
+        "max_replay_size": max_replay_size,
+        "batch_size": batch_size,
         "n_features": n_features,
         "warmup_transitions": warmup_transitions,
         "tau": tau,
-        "lr_aplha": lr_alpha, 
+        "lr_aplha": lr_alpha,
         "horizon": horizon,
         "gamma": gamma,
         "n_steps": n_steps,
@@ -105,7 +102,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
         "critic_lr": critic_lr,
         "n_epochs": n_epochs,
         "n_steps_test": n_steps_test,
-        "dirname": dirname
+        "dirname": dirname,
     }
 
     use_cuda = torch.cuda.is_available()
@@ -193,11 +190,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
         E = agent.policy.entropy(s)
 
         logger.epoch_info(n + 1, J=J, R=R, entropy=E)
-        wandb.log({
-            "J": J,
-            "R": R,
-            "E": E
-        })
+        wandb.log({"J": J, "R": R, "E": E})
         logger.log_best_agent(agent, J)
 
     logger.log_agent(agent)

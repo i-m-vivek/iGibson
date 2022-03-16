@@ -269,7 +269,7 @@ class iGibsonEnv(BaseEnv):
 
         # target_pos, target_orn = self.task.get_task_obs(self)
         target_pos = self.task.get_task_obs(self) - self.robots[0].get_position()
-        target_pos = rotate_vector_3d(target_pos - target_pos, *self.robots[0].get_rpy())
+        target_pos = rotate_vector_3d(target_pos, *self.robots[0].get_rpy())
         auxiliary_sensor[3:] = target_pos 
 
         return auxiliary_sensor
