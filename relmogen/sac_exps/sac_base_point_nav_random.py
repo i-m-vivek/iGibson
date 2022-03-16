@@ -70,7 +70,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     horizon = 20
     gamma = 0.99
     mdp = iGibsonMPEnv(
-        config_file="/home/vivek/WORKSPACE/TUD/vk_igibson/igibson_new/iGibson/igibson_usage/new_configs/tiago_base_point_nav_random_relmogen.yaml",
+        config_file="../../igibson_usage/new_configs/tiago_base_point_nav_random_relmogen.yaml",
         horizon=horizon,
         gamma=gamma,
         mode="gui"
