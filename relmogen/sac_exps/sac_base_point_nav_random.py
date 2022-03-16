@@ -70,13 +70,13 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     logger.info("Experiment Algorithm: " + alg.__name__)
 
     # MDP
-    horizon = 75
+    horizon = 100
     gamma = 0.99
     mdp = iGibsonMPEnv(
         config_file="../../igibson_usage/new_configs/tiago_base_point_nav_random_relmogen.yaml",
         horizon=horizon,
         gamma=gamma,
-        mode="gui"
+        # mode="gui"
     )
 
     # Settings
@@ -209,4 +209,4 @@ if __name__ == "__main__":
     algs = [SAC]
 
     for alg in algs:
-        experiment(alg=alg, n_epochs=200, n_steps=64, n_steps_test=64)
+        experiment(alg=alg, n_epochs=200, n_steps=1024, n_steps_test=512)
