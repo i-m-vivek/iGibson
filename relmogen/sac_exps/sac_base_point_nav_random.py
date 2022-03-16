@@ -73,7 +73,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
         config_file="../../igibson_usage/new_configs/tiago_base_point_nav_random_relmogen.yaml",
         horizon=horizon,
         gamma=gamma,
-        mode="gui"
+        # mode="gui"
     )
 
     # Settings
