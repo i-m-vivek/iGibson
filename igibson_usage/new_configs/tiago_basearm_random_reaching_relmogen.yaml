@@ -24,7 +24,7 @@ velocity: 1.0
 intial_robot_pos: [0.,0.,0.]
 # task
 task: reaching_random
-height_range: [0.3, 0.55]
+target_height_range: [0.3, 0.55]
 target_dist_min: 1.0
 target_dist_max: 5.0
 goal_format: polar
@@ -50,8 +50,8 @@ initial_pos_z_offset: 0.1
 collision_ignore_link_a_ids: []  # ignore collisions with these robot links
 
 # sensor spec
-output: [depth, occupancy_grid, auxiliary_sensor]
-auxiliary_sensor_dim: 94
+output: [occupancy_grid, auxiliary_sensor]
+auxiliary_sensor_dim: 6
 # image
 # ASUS Xtion PRO LIVE
 # https://www.asus.com/us/3D-Sensor/Xtion_PRO_LIVE

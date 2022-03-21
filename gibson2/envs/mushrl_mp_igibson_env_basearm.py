@@ -93,8 +93,8 @@ class iGibsonMPEnv(Environment):
         """
         base_reward = 0
         arm_reward = 0
-        # emb = action[-1] < 0.5
-        emb = True  # over-riding to check whether there is a bug in the code or not.
+        emb = action[-1] < 0.5
+        # emb = True  # over-riding to check whether there is a bug in the code or not.
         if emb == True:
             # added some offset to have a nice -1.25 to 1.25 model prediction.
             # We only need need +ve x, y values.

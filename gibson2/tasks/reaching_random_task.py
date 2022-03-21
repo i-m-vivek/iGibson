@@ -67,7 +67,7 @@ class ReachingRandomTask(PointNavRandomTask):
             # return initial_pos, initial_orn, target_pos, target_orn
             return initial_pos, initial_orn, target_pos
         else:
-            target_pos += np.random.uniform(
+            target_pos[2] += np.random.uniform(
                 self.target_height_range[0], self.target_height_range[1]
             )
             self.target_pos = target_pos
