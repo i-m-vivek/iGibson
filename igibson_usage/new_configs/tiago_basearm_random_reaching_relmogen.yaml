@@ -36,6 +36,8 @@ reward_type: l2
 success_reward: 10.0
 potential_reward_weight: 1.0
 collision_reward_weight: 0
+arm_mp_reward: 0
+base_mp_reward: -1
 
 # discount factor
 discount_factor: 0.99
