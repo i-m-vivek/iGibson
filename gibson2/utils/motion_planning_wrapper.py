@@ -373,7 +373,7 @@ class MotionPlanningWrapper(object):
         ) = self.get_ik_parameters()
 
         n_attempt = 0
-        max_attempt = 75
+        max_attempt = 10 # Changed (by Vivek) the number of IK iter, as it was taking a lot of time and slowing down the learning
         sample_fn = get_sample_fn(self.robot_id, self.arm_joint_ids)
         base_pose = get_base_values(self.robot_id)
         state_id = p.saveState()
