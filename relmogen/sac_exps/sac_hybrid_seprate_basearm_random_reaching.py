@@ -17,7 +17,7 @@ from tqdm import trange
 import wandb
 
 start_time = str(time.strftime("%Y%m%d-%H%M%S"))
-wandb.init(project="tud-project", entity="vassist", id = start_time)
+wandb.init(project="hrl-mm", entity="vassist", id = start_time)
 
 class CriticNetwork(nn.Module):
     def __init__(self, input_shape, output_shape, n_features, **kwargs):
@@ -61,7 +61,7 @@ class ActorNetwork(nn.Module):
 
 def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
-    dirname = alg.__name__ + "_basearm_random_reaching_run2"
+    dirname = alg.__name__ + "_basearm_random_reaching_run_1"
     logger = Logger(dirname, results_dir="relmogen_exps/", log_console=True)
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
