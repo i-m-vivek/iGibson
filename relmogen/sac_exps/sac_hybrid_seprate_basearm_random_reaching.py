@@ -123,20 +123,20 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
         network=ActorNetwork,
         n_features=n_features,
         input_shape=actor_input_shape,
-        output_shape=6,
+        output_shape=(6, ),
         use_cuda=use_cuda,
     )
     actor_sigma_params = dict(
         network=ActorNetwork,
         n_features=n_features,
         input_shape=actor_input_shape,
-        output_shape=6,
+        output_shape=(6, ),
         use_cuda=use_cuda,
     )
     actor_discrete_params = dict(network=ActorNetwork,
                                 n_features=n_features,
                                 input_shape=actor_input_shape,
-                                output_shape=1,
+                                output_shape=(1,),
                                 use_cuda=use_cuda)
 
     actor_optimizer = {"class": optim.Adam, "params": {"lr": actor_lr}}
