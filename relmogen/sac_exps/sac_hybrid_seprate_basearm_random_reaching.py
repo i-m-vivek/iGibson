@@ -17,7 +17,6 @@ from tqdm import trange
 import wandb
 
 start_time = str(time.strftime("%Y%m%d-%H%M%S"))
-wandb.init(project="hrl-mm", entity="vassist", id = start_time)
 
 class CriticNetwork(nn.Module):
     def __init__(self, input_shape, output_shape, n_features, **kwargs):
@@ -65,12 +64,12 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     logger = Logger(dirname, results_dir="relmogen_exps/", log_console=True)
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
-
+    yaml_file = "../../igibson_usage/new_configs/tiago_basearm_random_reaching_relmogen.yaml"
     # MDP
     horizon = 50
     gamma = 0.99
     mdp = iGibsonMPEnv(
-        config_file="../../igibson_usage/new_configs/tiago_basearm_random_reaching_relmogen.yaml",
+        config_file=yaml_file,
         horizon=horizon,
         gamma=gamma,
         # mode="gui"
@@ -87,7 +86,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     actor_lr = 3e-4
     critic_lr = 3e-4
 
-    wandb.config = {
+    hyperparameter_defaults = {
         "initial_replay_size": initial_replay_size,
         "max_replay_size": max_replay_size,
         "batch_size": batch_size,
@@ -104,6 +103,11 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
         "n_steps_test": n_steps_test,
         "dirname": dirname,
     }
+    config_dict = dict(
+        yaml=yaml_file,
+        params=hyperparameter_defaults
+    )
+    wandb.init(project="hrl-mm", entity="vassist", id = start_time, config=config_dict)
 
     use_cuda = torch.cuda.is_available()
     logger.info(f"horizon: {horizon}")
