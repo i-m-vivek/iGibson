@@ -42,9 +42,9 @@ class iGibsonMPEnv(Environment):
         observation_space = Box(-np.inf, np.inf, (obs_shape,))
         # action_space = Box(-np.inf, np.inf, (7, )) # (x, y, orn, x_ee, y_ee, z_ee, embodiment)
         action_space = Box(
-            np.array([-1.25, -1.25, -np.pi, -np.pi, 0.5, 0.1, 0]),
-            np.array([1.25, 1.25, np.pi, np.pi, 1.0, 0.8, 1]),
-            (7,),
+            np.array([-1.25, -1.25, -np.pi, -np.pi, 0.5, 0.1, 0, 0]),
+            np.array([1.25, 1.25, np.pi, np.pi, 1.0, 0.8, 1, 1]),
+            (8,),
         )  # (x, y, orn, degree_ee, distance_ee, height_ee, embodiment), for the arm everything is in robot frame
         mdp_info = MDPInfo(observation_space, action_space, gamma, horizon)
         super().__init__(mdp_info)
@@ -88,14 +88,13 @@ class iGibsonMPEnv(Environment):
 
     def step(self, action):
         """
-        3 dim action
-        (x, y, orn, x_ee, y_ee, z_ee, emb)
+        (x, y, orn, x_ee, y_ee, z_ee, base, arm)
         """
         base_reward = 0
         arm_reward = 0
-        emb = action[-1] < 0.5
+        # emb = action[-1] < 0.5
         # emb = True  # over-riding to check whether there is a bug in the code or not.
-        if emb == True:
+        if action[-2] == 1:
             # added some offset to have a nice -1.25 to 1.25 model prediction.
             # We only need need +ve x, y values.
             action_c = copy.deepcopy(action)
@@ -131,6 +130,7 @@ class iGibsonMPEnv(Environment):
             # target_ee[-1] = action[5]
 
             joint_pos = self.motion_planner.get_arm_joint_positions(target_ee)
+            # TODO(Vivek): Set the joint pos only, no need to do the arm planning
             if joint_pos is not None:
                 arm_path = self.motion_planner.plan_arm_motion(joint_pos)
                 if arm_path:

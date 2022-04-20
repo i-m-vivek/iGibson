@@ -69,8 +69,6 @@ gibson/assets
 notebook
 build
 dist
-<<<<<<< HEAD
 gibson2/data
-=======
-gibson2/data
->>>>>>> 6e8285a51a3029e34cd52f49c6ee10aaae0bbbfc
+
+*.msh

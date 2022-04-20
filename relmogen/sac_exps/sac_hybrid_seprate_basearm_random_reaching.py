@@ -25,7 +25,7 @@ class CriticNetwork(nn.Module):
         n_input = input_shape[-1]
         n_output = output_shape[0]
 
-        self._h1 = nn.Linear(6 + 7, n_features)
+        self._h1 = nn.Linear(6 + 8, n_features)
         self._h2 = nn.Linear(n_features, n_output)
 
         nn.init.xavier_uniform_(self._h1.weight, gain=nn.init.calculate_gain("relu"))
@@ -60,7 +60,7 @@ class ActorNetwork(nn.Module):
 
 def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
-    dirname = alg.__name__ + "_basearm_random_reaching_run_1"
+    dirname = alg.__name__ + f"_basearm_random_reaching_{start_time}"
     logger = Logger(dirname, results_dir="relmogen_exps/", log_console=True)
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
@@ -140,7 +140,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     actor_discrete_params = dict(network=ActorNetwork,
                                 n_features=n_features,
                                 input_shape=actor_input_shape,
-                                output_shape=(1,),
+                                output_shape=(2,),
                                 use_cuda=use_cuda)
 
     actor_optimizer = {"class": optim.Adam, "params": {"lr": actor_lr}}
