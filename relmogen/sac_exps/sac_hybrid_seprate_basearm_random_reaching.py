@@ -15,6 +15,7 @@ from gibson2.envs.mushrl_mp_igibson_env_basearm import iGibsonMPEnv
 
 from tqdm import trange
 import wandb
+import yaml
 
 start_time = str(time.strftime("%Y%m%d-%H%M%S"))
 
@@ -64,7 +65,11 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     logger = Logger(dirname, results_dir="relmogen_exps/", log_console=True)
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
+    
     yaml_file = "../../igibson_usage/new_configs/tiago_basearm_random_reaching_relmogen.yaml"
+    with open(yaml_file, "rb") as f:
+        yaml_dict = yaml.safe_load(f)
+    
     # MDP
     horizon = 50
     gamma = 0.99
@@ -104,7 +109,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
         "dirname": dirname,
     }
     config_dict = dict(
-        yaml=yaml_file,
+        yaml=yaml_dict,
         params=hyperparameter_defaults
     )
     wandb.init(project="hrl-mm", entity="vassist", id = start_time, config=config_dict)
