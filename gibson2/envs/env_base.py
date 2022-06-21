@@ -8,6 +8,7 @@ from gibson2.robots.freight_robot import Freight
 from gibson2.robots.fetch_robot import Fetch
 from gibson2.robots.locobot_robot import Locobot
 from gibson2.robots.tiago_single_robot import Tiago_Single
+from gibson2.robots.tiago_single_robot_mp import Tiago_SingleMP
 from gibson2.simulator import Simulator
 from gibson2.scenes.empty_scene import EmptyScene
 from gibson2.scenes.stadium_scene import StadiumScene
@@ -247,6 +248,8 @@ class BaseEnv(gym.Env):
             robot = Locobot(self.config)
         elif self.config["robot"] == "Tiago_Single":
             robot = Tiago_Single(self.config)
+        elif self.config["robot"] == "Tiago_SingleMP":
+            robot = Tiago_SingleMP(self.config)
         else:
             raise Exception("unknown robot type: {}".format(self.config["robot"]))
 

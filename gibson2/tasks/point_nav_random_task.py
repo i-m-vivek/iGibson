@@ -65,7 +65,10 @@ class PointNavRandomTask(PointNavFixedTask):
                     break
             if not (self.target_dist_min < dist < self.target_dist_max):
                 print("WARNING: Failed to sample initial and target positions")
-            initial_orn = np.array([0, 0, np.random.uniform(-np.pi, np.pi)])
+            if "intial_robot_pos" in self.config:
+                initial_orn = np.array(self.config["initial_orn"])
+            else:
+                initial_orn = np.array([0, 0, np.random.uniform(-np.pi, np.pi)])
             # return initial_pos, initial_orn, target_pos, target_orn
             return initial_pos, initial_orn, target_pos
 
