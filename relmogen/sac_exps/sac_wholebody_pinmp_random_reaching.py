@@ -62,7 +62,7 @@ class ActorNetwork(nn.Module):
 
 def experiment(alg, n_epochs, n_steps, n_steps_test):
     np.random.seed()
-    dirname = alg.__name__ + "_basearm_random_reaching_run2"
+    dirname = alg.__name__ + "_wholebody_pinMP"
     logger = Logger(dirname, results_dir="relmogen_exps/", log_console=True)
     logger.strong_line()
     logger.info("Experiment Algorithm: " + alg.__name__)
