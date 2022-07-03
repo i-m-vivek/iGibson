@@ -422,7 +422,7 @@ class iGibsonMPEnv(Environment):
         self.max_dist_subgoal = 2
         
         self.load_tiago(os.path.join(gibson2.assets_path, "models", "tiago"), "tiago_single_mp.urdf")
-        self.num_iter = 500
+        self.num_iter = 100
 
     def getPosVelJoints(self, robotId, joint_indexes):  # Function to get the position/velocity of all joints from pybullet
 

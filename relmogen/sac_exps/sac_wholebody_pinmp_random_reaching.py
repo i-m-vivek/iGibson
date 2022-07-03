@@ -68,7 +68,7 @@ def experiment(alg, n_epochs, n_steps, n_steps_test):
     logger.info("Experiment Algorithm: " + alg.__name__)
 
     # MDP
-    horizon = 50
+    horizon = 25
     gamma = 0.99
     mdp = iGibsonMPEnv(
         config_file="../../igibson_usage/new_configs/tiago_wholebody_random_reaching_relmogen.yaml",
