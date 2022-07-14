@@ -399,11 +399,17 @@ class iGibsonMPEnv(Environment):
 
         observation_space = Box(-np.inf, np.inf, (obs_shape,))
         # action_space = Box(-np.inf, np.inf, (7, )) # (x, y, orn, x_ee, y_ee, z_ee, embodiment)
+        # action_space = Box(
+        #     np.array([-5, -5, 0.5, -np.pi, -np.pi/2, -np.pi]),
+        #     np.array([5, 5, 1.8, np.pi, np.pi/2, np.pi]),
+        #     (6,),
+        # )  # (x, y, orn, robo)
+
         action_space = Box(
-            np.array([-10, -10, 0.5, -np.pi, -np.pi/2, -np.pi]),
-            np.array([10, 10, 1.8, np.pi, np.pi/2, np.pi]),
-            (6,),
-        )  # (x, y, orn, robo)
+            np.array([-5, -5, 0.5]),
+            np.array([5, 5, 1.8]),
+            (3,),
+        )
         mdp_info = MDPInfo(observation_space, action_space, gamma, horizon)
         super().__init__(mdp_info)
 
@@ -422,7 +428,7 @@ class iGibsonMPEnv(Environment):
         self.max_dist_subgoal = 2
         
         self.load_tiago(os.path.join(gibson2.assets_path, "models", "tiago"), "tiago_single_mp.urdf")
-        self.num_iter = 100
+        self.num_iter = 500
 
     def getPosVelJoints(self, robotId, joint_indexes):  # Function to get the position/velocity of all joints from pybullet
 
@@ -656,7 +662,8 @@ class iGibsonMPEnv(Environment):
         # robot_to_world = np.matmul(rotation_mtrx, local_action)[:3]
         # robot_to_world[2] = action[2]  # change the z output to orn, and as orn is not in the goal it does not matter
 
-        self.do_mp(action[:3], action[3:])
+        # self.do_mp(action[:3], action[3:])
+        self.do_mp(action, None)
         apply = np.zeros(self.env.action_space.shape[0])
         raw_state, reward, done, info = self.env.step(apply)
 
